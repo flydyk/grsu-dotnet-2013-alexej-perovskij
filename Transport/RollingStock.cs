@@ -11,21 +11,21 @@ namespace Transport
         public int WheelsCount { get; set; }
         public int Weight { get; set; }
         public int ID { get; set; }
-        
+
         /// <summary>
         /// Инициализирует новый объект класса RollingStock c пармаетрами по умолчанию
         /// </summary>
-        public RollingStock():
-            this(4,20000,1000001)
+        public RollingStock() :
+            this(4, 20000, 1000001)
         {
-            
+
         }
         /// <summary>
         /// Инициализирует новый объект класса RollingStock
         /// </summary>
         /// <param name="wheelsCount">Колличество колес у единицы подвижного состава</param>
         /// <param name="weight">Масса в килограммах</param>
-        /// <param name="id">Индентификационный номер</param>
+        /// <param name="id">Идентификационный номер</param>
         public RollingStock(int wheelsCount, int weight, int id)
         {
             WheelsCount = wheelsCount;

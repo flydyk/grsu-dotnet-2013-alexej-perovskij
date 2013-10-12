@@ -13,8 +13,25 @@ namespace Transport
         Business
     }
 
-    public sealed class PassengerWagon:Wagon
+    public sealed class PassengerWagon : Wagon
     {
+        public WagonComfortClass Comfort { get; private set; }
 
+        public PassengerWagon()
+            : this(WagonComfortClass.Middle)
+        {
+        }
+
+        public PassengerWagon(WagonComfortClass comfort)
+            : base()
+        {
+            Comfort = comfort;
+        }
+
+        public PassengerWagon(WagonComfortClass comfort, int capacity)
+            : base(capacity)
+        {
+            Comfort = comfort;
+        }
     }
 }
