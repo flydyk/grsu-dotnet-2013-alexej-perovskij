@@ -6,11 +6,15 @@ using System.Threading.Tasks;
 
 namespace Transport
 {
-    class Program
+    public enum WagonComfortClass
     {
-        static void Main(string[] args)
-        {
-            
-        }
+        Cheap,
+        Middle,
+        Business
+    }
+
+    public sealed class PassengerWagon:Wagon
+    {
+
     }
 }

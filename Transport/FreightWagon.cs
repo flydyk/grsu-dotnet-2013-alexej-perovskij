@@ -6,11 +6,8 @@ using System.Threading.Tasks;
 
 namespace Transport
 {
-    class Program
+    public sealed class FreightWagon:Wagon
     {
-        static void Main(string[] args)
-        {
-            
-        }
+
     }
 }

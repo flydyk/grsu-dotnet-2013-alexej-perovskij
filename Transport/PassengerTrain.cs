@@ -6,11 +6,8 @@ using System.Threading.Tasks;
 
 namespace Transport
 {
-    class Program
+    public class PassengerTrain
     {
-        static void Main(string[] args)
-        {
-            
-        }
+        List<PassengerWagon> wagons = null;
     }
 }

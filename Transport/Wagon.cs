@@ -6,11 +6,12 @@ using System.Threading.Tasks;
 
 namespace Transport
 {
-    class Program
+    
+    public abstract class Wagon:RollingStock
     {
-        static void Main(string[] args)
+
+        public Wagon()
         {
-            
         }
     }
 }
