@@ -16,6 +16,32 @@ namespace Transport
     public sealed class PassengerWagon : Wagon
     {
         public WagonComfortClass Comfort { get; private set; }
+        private int passengerCount = 0;
+
+        public int PassengerCount
+        {
+            get { return passengerCount; }
+            private set 
+            {
+                if (value <= 0) passengerCount = 0;
+                else
+                if (Capacity >= value)
+                    passengerCount = value;
+                else throw new Exception("Wagon is full");
+            }
+        }
+        public void AddPassenger()
+        {
+            PassengerCount++;
+        }
+        public void RemovePassenger(int count)
+        {
+            PassengerCount -= count;
+        }
+        public void RemovePassenger()
+        {
+            PassengerCount = 0;
+        }
 
         public PassengerWagon()
             : this(WagonComfortClass.Middle)
@@ -23,7 +49,6 @@ namespace Transport
         }
 
         public PassengerWagon(WagonComfortClass comfort)
-            : base()
         {
             Comfort = comfort;
         }
@@ -32,6 +57,13 @@ namespace Transport
             : base(capacity)
         {
             Comfort = comfort;
+        }
+
+        public override string ToString()
+        {
+            return string.Format(
+                "{0}, Comfort: {1}, PassengerCount: {2}]",
+                base.ToString().Substring(0, base.ToString().Length - 1), Comfort, PassengerCount);
         }
     }
 }

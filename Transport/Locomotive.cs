@@ -13,22 +13,17 @@ namespace Transport
         SteamLoco
     }
 
-    public class Locomotive : RollingStock
+    public sealed class Locomotive : RollingStock
     {
         public LocomotiveType LocomotiveType { get; private set; }
         
+
         public Locomotive(LocomotiveType locoType)
         {
             LocomotiveType = locoType;
         }
 
 
-        public override bool IsWagon
-        {
-            get
-            {
-                return false;
-            }
-        }
+
     }
 }

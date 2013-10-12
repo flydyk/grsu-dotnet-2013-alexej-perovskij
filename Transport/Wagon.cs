@@ -28,10 +28,14 @@ namespace Transport
         /// Инициализирует новый объект класса Wagon
         /// </summary>
         /// <param name="capacity">Вместимость вагона</param>
-        public Wagon(int capacity) :
-            base()
+        public Wagon(int capacity)
         {
             this.capacity = capacity;
+        }
+
+        public override string ToString()
+        {
+            return string.Format("{0}, Capacity: {1}]", base.ToString().Substring(0,base.ToString().Length-1), Capacity);
         }
     }
 }

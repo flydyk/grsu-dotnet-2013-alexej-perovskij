@@ -35,7 +35,7 @@ namespace Transport
         public override string ToString()
         {
             return string.Format(
-                "[ID: {0}, WheelCount: {1}, Weight: {2}",
+                "[ID: {0}, WheelCount: {1}, Weight: {2}]",
                 ID, WheelsCount, Weight);
         }
     }
