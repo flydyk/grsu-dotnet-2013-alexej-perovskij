@@ -12,8 +12,18 @@ namespace Transport
         {
             FreightWagon fw = new FreightWagon(CargoType.Animals);
             PassengerWagon pw = new PassengerWagon(WagonComfortClass.Business);
-            Console.WriteLine(fw.ToString());
-            Console.WriteLine(pw.ToString());
+            Locomotive loco = new Locomotive();
+            PassengerTrain pt = new PassengerTrain();
+            foreach (var item in pt.GetPassWagons())
+            {
+                Console.WriteLine(item.ToString());
+            }
+            pt.RemovePassengerWagon(3);
+            
+            foreach (var item in pt.GetPassWagons())
+            {
+                Console.WriteLine(item.ToString());
+            }
             Console.ReadLine();
         }
     }

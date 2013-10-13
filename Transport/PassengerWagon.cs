@@ -18,31 +18,6 @@ namespace Transport
         public WagonComfortClass Comfort { get; private set; }
         private int passengerCount = 0;
 
-        public int PassengerCount
-        {
-            get { return passengerCount; }
-            private set 
-            {
-                if (value <= 0) passengerCount = 0;
-                else
-                if (Capacity >= value)
-                    passengerCount = value;
-                else throw new Exception("Wagon is full");
-            }
-        }
-        public void AddPassenger()
-        {
-            PassengerCount++;
-        }
-        public void RemovePassenger(int count)
-        {
-            PassengerCount -= count;
-        }
-        public void RemovePassenger()
-        {
-            PassengerCount = 0;
-        }
-
         public PassengerWagon()
             : this(WagonComfortClass.Middle)
         {
@@ -58,6 +33,33 @@ namespace Transport
         {
             Comfort = comfort;
         }
+
+
+        public int PassengerCount
+        {
+            get { return passengerCount; }
+            private set
+            {
+                if (value <= 0) passengerCount = 0;
+                else
+                    if (Capacity >= value)
+                        passengerCount = value;
+                    else throw new Exception("Wagon is full");
+            }
+        }
+        public void AddPassenger()
+        {
+            PassengerCount++;
+        }
+        public void RemovePassenger(int count)
+        {
+            PassengerCount -= count;
+        }
+        public void RemovePassenger()
+        {
+            PassengerCount = 0;
+        }
+
 
         public override string ToString()
         {
