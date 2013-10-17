@@ -58,6 +58,14 @@ namespace Transport
             Load = 0;
         }
 
+        public override void Close()
+        {
+            Console.WriteLine("{0}.Close()", GetType().FullName);
+        }
+        public override void Open()
+        {
+            Console.WriteLine("{0}.Open()", GetType().FullName);
+        }
         public override string ToString()
         {
             return string.Format(

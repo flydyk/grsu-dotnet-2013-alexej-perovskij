@@ -13,7 +13,7 @@ namespace Transport
         SteamLoco
     }
 
-    public sealed class Locomotive : RollingStock
+    public sealed class Locomotive : RollingStock,IRunable
     {
         public LocomotiveType LocomotiveType { get; private set; }
         readonly int maxSpeed = 150;
@@ -56,9 +56,36 @@ namespace Transport
             get { return maxSpeed; }
         }
 
+        public void Run()
+        {
+            Console.WriteLine("{0}.IRunable.Run()", GetType().FullName);
+        }
 
-        public void Run() { }
-        public void Stop() { }
+        public void Stop()
+        {
+            Console.WriteLine("{0}.IRunable.Stop()", GetType().FullName);
+        }
 
+        public override ICouplable FrontCoupler
+        {
+            get
+            {
+                throw new CouplingException("Locomotive have not Front Coupler");
+            }
+            set
+            {
+                throw new CouplingException("Locomotive have not Front Coupler");
+            }
+        }
+        public override void Couple(ICouplable that, Coupler c)
+        {
+            if (c == Coupler.Front) throw new CouplingException("Locomotive have not Front Coupler");
+            base.Couple(that, c);
+        }
+        public override void Decouple(Coupler c)
+        {
+            if (c == Coupler.Front) throw new CouplingException("Locomotive have not Front Coupler");
+            base.Decouple(c);
+        }
     }
 }

@@ -70,13 +70,19 @@ namespace Transport
         {
             sits[PassengerCount++] = true;            
         }
-        public void RemovePassenger(int count)
+        public void RemovePassengers(int count)
         {
-            PassengerCount -= count;
+            for (int i = 0; i < count; i++)
+            {
+                sits[--PassengerCount] = false;
+            }
         }
-        public void RemovePassenger()
+        public void RemovePassengers()
         {
-            PassengerCount = 0;
+            while (--PassengerCount >= 0) 
+            {
+                sits[PassengerCount] = false;
+            }
         }
         /// <summary>
         /// Returns copy of array which contains info about sit places
@@ -87,6 +93,15 @@ namespace Transport
             bool[] temp = new bool[Capacity];
             Array.Copy(sits, temp, Capacity);
             return temp;
+        }
+
+        public override void Close()
+        {
+            Console.WriteLine("{0}.Close()", GetType().FullName);
+        }
+        public override void Open()
+        {
+            Console.WriteLine("{0}.Open()", GetType().FullName);
         }
 
         public override string ToString()

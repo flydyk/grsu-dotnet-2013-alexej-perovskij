@@ -42,6 +42,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="FreightWagon.cs" />
+    <Compile Include="ICouplable.cs" />
+    <Compile Include="IRunable.cs" />
     <Compile Include="Locomotive.cs" />
     <Compile Include="PassengerTrain.cs" />
     <Compile Include="PassengerWagon.cs" />

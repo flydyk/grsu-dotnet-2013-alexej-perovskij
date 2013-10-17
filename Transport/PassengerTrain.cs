@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Transport
 {
-    public class PassengerTrain
+    public class PassengerTrain:IRunable
     {
         List<PassengerWagon> pWagons = null;
         List<FreightWagon> fWagons = new List<FreightWagon>();
@@ -84,21 +84,6 @@ namespace Transport
             else fWagons[1].LoadWagon(luggage);
         }
 
-        private PassengerWagon this[int ID]
-        {
-            get
-            {
-                PassengerWagon pw = null;
-                pw = pWagons.Find(p => { return p.ID == ID; });
-                if (pw == null) throw new Exception("Invalid passenger's wagon ID number");
-                else return pw;
-            }
-        }
-        public int PassWagonCount
-        {
-            get { return pWagons.Count; }
-        }
-
 
         public void SortWagonsByComfort() 
         {
@@ -109,7 +94,31 @@ namespace Transport
             pWagons.Sort();
         }
 
-        public void Run() { loco.Run(); }
-        public void Stop() { loco.Stop(); }
+        public void Run()
+        {
+            loco.Run();
+        }
+
+        public void Stop()
+        {
+            loco.Stop();
+        }
+
+
+        private PassengerWagon this[int ID]
+        {
+            get
+            {
+                PassengerWagon pw = null;
+                pw = pWagons.Find(p => { return p.ID == ID; });
+                if (pw == null) throw new Exception("Invalid passenger's wagon ID number");
+                else return pw;
+            }
+        }
+
+        public int PassWagonCount
+        {
+            get { return pWagons.Count; }
+        }
     }
 }
