@@ -27,21 +27,47 @@ namespace Transport
 
             }
             pt.SortWagonsByComfort();
-            foreach (var item in pt.GetPassWagons())
-            {
-                Console.WriteLine(item.ToString());
-            }
+            Console.WriteLine("=================Sorted by COMFORT====================");
+            PrintInfoAboutTrain(pt);
             Console.WriteLine();
+            Console.WriteLine("=================Sorted by Passenger count============");
             pt.SortWagonsByPassCount();
-            foreach (var item in pt.GetPassWagons())
-            {
-                Console.WriteLine(item.ToString());
-            }
-            foreach (var item in pt.GetLuggageWagons())
-            {
-                Console.WriteLine(item.ToString());
-            }
+            PrintInfoAboutTrain(pt);
+            int lowBound=10,highBound=20;
+            Console.WriteLine();
+            Console.WriteLine("============Selected with bounds [{0}, {1}]===========", lowBound, highBound);
+            PrintInfoAboutTrain(new PassengerTrain(GetWagonsByCount(pt, lowBound, highBound), new Locomotive()));
             Console.ReadLine();
+        }
+
+        static void PrintInfoAboutTrain(PassengerTrain train)
+        {
+            foreach (var PWagon in train.GetPassWagons())
+            {
+                Console.WriteLine(PWagon.ToString());
+                for (int i = 0; i < PWagon.Capacity/2; i++)
+                {
+                    Console.Write("place {0}: {1}\t", i, PWagon[i] ? "+" : "-");
+                }
+                Console.WriteLine();
+                for (int i = PWagon.Capacity/2; i < PWagon.Capacity; i++)
+                {
+                    Console.Write("place {0}: {1}\t", i, PWagon[i] ? "+" : "-");
+                }
+                Console.WriteLine();
+            }
+
+            foreach (var LWagon in train.GetLuggageWagons())
+            {
+                Console.WriteLine(LWagon.ToString());
+            }            
+        }
+
+        static List<PassengerWagon> GetWagonsByCount(PassengerTrain train, int lowBound, int highBound)
+        {
+            return (from wagon in train.GetPassWagons()
+                    where wagon.PassengerCount >= lowBound && wagon.PassengerCount <= highBound
+                    select wagon).ToList<PassengerWagon>();
         }
     }
 }
