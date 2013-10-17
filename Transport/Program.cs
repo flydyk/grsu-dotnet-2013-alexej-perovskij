@@ -17,6 +17,7 @@ namespace Transport
             
             pt.AddLuggageWagon();
             pt.AddPassengerWagon(WagonComfortClass.Business, 30);
+            pt.AddPassengerWagon(WagonComfortClass.Cheap, 30);
             pt.AddLuggageWagon();
 
             Random rnd = new Random();
@@ -25,7 +26,13 @@ namespace Transport
                 pt.AddPassenger(100 + rnd.Next(pt.PassWagonCount), i % 2);
 
             }
-
+            pt.SortWagonsByComfort();
+            foreach (var item in pt.GetPassWagons())
+            {
+                Console.WriteLine(item.ToString());
+            }
+            Console.WriteLine();
+            pt.SortWagonsByPassCount();
             foreach (var item in pt.GetPassWagons())
             {
                 Console.WriteLine(item.ToString());

@@ -95,7 +95,20 @@ namespace Transport
             }
         }
         public int PassWagonCount
-        { get { return pWagons.Count; } }
+        {
+            get { return pWagons.Count; }
+        }
+
+
+        public void SortWagonsByComfort() 
+        {
+            pWagons.Sort(PassengerWagon.ComfortComparer);
+        }
+        public void SortWagonsByPassCount()
+        {
+            pWagons.Sort();
+        }
+
         public void Run() { loco.Run(); }
         public void Stop() { loco.Stop(); }
     }
