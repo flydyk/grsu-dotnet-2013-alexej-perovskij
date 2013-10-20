@@ -66,26 +66,5 @@ namespace Transport
             Console.WriteLine("{0}.IRunable.Stop()", GetType().FullName);
         }
 
-        public override ICouplable FrontCoupler
-        {
-            get
-            {
-                throw new CouplingException("Locomotive have not Front Coupler");
-            }
-            set
-            {
-                throw new CouplingException("Locomotive have not Front Coupler");
-            }
-        }
-        public override void Couple(ICouplable that, Coupler c)
-        {
-            if (c == Coupler.Front) throw new CouplingException("Locomotive have not Front Coupler");
-            base.Couple(that, c);
-        }
-        public override void Decouple(Coupler c)
-        {
-            if (c == Coupler.Front) throw new CouplingException("Locomotive have not Front Coupler");
-            base.Decouple(c);
-        }
     }
 }

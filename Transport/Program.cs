@@ -45,7 +45,7 @@ namespace Transport
             Console.WriteLine("\n\n");
             
             //TESTING WORK OF CLASS METHODS
-            bool error = true;
+            bool error = false;
             TestClassMethods(fw, pw, loco, pt, error);
 
             Console.ReadLine();
