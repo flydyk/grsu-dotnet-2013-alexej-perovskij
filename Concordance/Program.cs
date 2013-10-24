@@ -17,7 +17,7 @@ namespace Concordance
             switch (args.Length)
             {
                 case 0:
-                    Console.Write("Enter a FULL PATH to txt file for which you want create corcondance: ");
+                    Console.Write("Enter a FULL PATH to txt file for which you want create concordance: ");
                     BuildConcordance(Console.ReadLine(), concordance);
                     break;
                 case 1:
@@ -39,7 +39,7 @@ namespace Concordance
                 Path.GetExtension(loadPath);
 
             concordance.PrintToFile(path);
-            Console.Write("Corcordance was succesfully created.\nPress any key to exit..");
+            Console.Write("Concordance was succesfully created.\nPress any key to exit..");
         }
     }
 }
