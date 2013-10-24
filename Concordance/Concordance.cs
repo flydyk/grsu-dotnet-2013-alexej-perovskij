@@ -10,9 +10,17 @@ namespace Concordance
 {
     public class Concordance
     {
+        private const int DEFAULT_LINES_PER_PAGE = 40;
         SortedDictionary<char, SortedDictionary<string, WordInfo>> concordance;
         string[] Text;
-        private int linesPerPage = 40;
+        private int linesPerPage = DEFAULT_LINES_PER_PAGE;
+        
+
+        public static int DefaultLinesPerPage
+        {
+            get { return DEFAULT_LINES_PER_PAGE; }
+        }
+        
 
         public int LinesPerPage
         {

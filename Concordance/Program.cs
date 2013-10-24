@@ -18,10 +18,13 @@ namespace Concordance
             {
                 case 0:
                     Console.Write("Enter a FULL PATH to txt file for which you want create concordance: ");
-                    BuildConcordance(Console.ReadLine(), concordance);
+                    BuildConcordance(Console.ReadLine(), concordance, Concordance.DefaultLinesPerPage);
                     break;
                 case 1:
-                    BuildConcordance(args[0], concordance);
+                    BuildConcordance(args[0], concordance, Concordance.DefaultLinesPerPage);
+                    break;
+                case 2:
+                    BuildConcordance(args[0], concordance, int.Parse(args[1]));
                     break;
                 default:
                     break;
@@ -29,9 +32,9 @@ namespace Concordance
             Console.ReadLine();
         }
 
-        private static void BuildConcordance(string loadPath, Concordance concordance)
+        private static void BuildConcordance(string loadPath, Concordance concordance, int linesPerPage)
         {
-            concordance = new Concordance(loadPath, null);
+            concordance = new Concordance(loadPath, null) { LinesPerPage = linesPerPage };
             concordance.GenerateConcordance();
             string path =
                 Path.GetFileNameWithoutExtension(loadPath) +
