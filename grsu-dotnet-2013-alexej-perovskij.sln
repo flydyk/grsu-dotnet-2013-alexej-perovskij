@@ -3,6 +3,8 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Express 2012 for Windows Desktop
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Transport", "Transport\Transport.csproj", "{61365786-1D58-41FC-A601-9F7EB4AD5B45}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Concordance", "Concordance\Concordance.csproj", "{FCEA7444-8341-4B32-98F5-450FE30435C2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -13,6 +15,10 @@ Global
 		{61365786-1D58-41FC-A601-9F7EB4AD5B45}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{61365786-1D58-41FC-A601-9F7EB4AD5B45}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{61365786-1D58-41FC-A601-9F7EB4AD5B45}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FCEA7444-8341-4B32-98F5-450FE30435C2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FCEA7444-8341-4B32-98F5-450FE30435C2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FCEA7444-8341-4B32-98F5-450FE30435C2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FCEA7444-8341-4B32-98F5-450FE30435C2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
