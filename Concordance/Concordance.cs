@@ -40,12 +40,10 @@ namespace Concordance
             {
                 Text = File.ReadAllLines(path, encoding);
             }
-            catch (FileNotFoundException ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
             catch (Exception e)
-            { Console.WriteLine(e.Message); }
+            {
+                throw;
+            }
         }
 
         public Concordance(string[] text)
