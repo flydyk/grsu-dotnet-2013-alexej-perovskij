@@ -10,6 +10,9 @@ namespace ATS
     {
         static void Main(string[] args)
         {
+            ATS ats = new ATS(10, "Owner");
+            ats.AddStand(new ATSStand(1));
+            
         }
     }
 }

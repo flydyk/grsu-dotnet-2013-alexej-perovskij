@@ -33,12 +33,16 @@ namespace ATS
             get { return id; }
             private set
             {
-                if (value > 0)
+                if (value >= 0)
                     id = value;
                 else throw new ArgumentOutOfRangeException("ID value must be greater than zero");
             }
         }
-
+        /// <summary>
+        /// Get Port by ID
+        /// </summary>
+        /// <param name="id">ID of the port</param>
+        /// <returns>Port of the ATSStand</returns>
         public Port this[int id]
         {
             get { return ports[id]; }

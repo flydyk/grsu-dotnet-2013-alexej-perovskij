@@ -11,6 +11,7 @@ namespace ATS
         int id;
         Dictionary<int, ATSStand> stands;
 
+
         public string Owner { get; set; }
 
         public ATS(int id, string owner)
@@ -32,6 +33,11 @@ namespace ATS
             stands.Remove(id);
         }
 
+        /// <summary>
+        /// Get ATSStand by ID 
+        /// </summary>
+        /// <param name="id">ID of the ATSStaion</param>
+        /// <returns>ATSStand of the ATS</returns>
         public ATSStand this[int id]
         {
             get { return stands[id]; }
@@ -42,7 +48,7 @@ namespace ATS
             get { return id; }
             private set
             {
-                if (value > 0)
+                if (value >= 0)
                     id = value;
                 else throw new ArgumentOutOfRangeException("ID value must be greater than zero");
             }
