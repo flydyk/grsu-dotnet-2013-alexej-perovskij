@@ -55,7 +55,7 @@ namespace Concordance
                 Path.GetExtension(loadPath);
 
             concordance.PrintToFile(path);
-            Console.Write("Concordance was succesfully created.\nPress any key to exit..");
+            Console.Write("Concordance was succesfully created.");
         }
     }
 }
