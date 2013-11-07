@@ -8,7 +8,7 @@ namespace ATS
 {
     public interface IHaveConnection
     {
-        void Connect(IHaveConnection device);
+        IHaveConnection ConnectedDevice { get; set; }
         bool Connected { get; }
     }
 }

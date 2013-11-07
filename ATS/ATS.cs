@@ -10,8 +10,7 @@ namespace ATS
     {
         int id;
         Dictionary<int, ATSStand> stands;
-
-
+        
         public string Owner { get; set; }
 
         public ATS(int id, string owner)
@@ -33,6 +32,10 @@ namespace ATS
             stands.Remove(id);
         }
 
+        public void SignContract(Subscriber sub, Tarrif tarrif)
+        {
+
+        }
         /// <summary>
         /// Get ATSStand by ID 
         /// </summary>
@@ -52,6 +55,15 @@ namespace ATS
                     id = value;
                 else throw new ArgumentOutOfRangeException("ID value must be greater than zero");
             }
+        }
+    }
+
+    public class IncommingCallEventArgs:EventArgs
+    {
+        readonly long Number;
+        public IncommingCallEventArgs(long number)
+        {
+            Number = number;
         }
     }
 }

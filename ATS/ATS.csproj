@@ -43,6 +43,7 @@
   <ItemGroup>
     <Compile Include="ATS.cs" />
     <Compile Include="ATSStand.cs" />
+    <Compile Include="BellEventArgs.cs" />
     <Compile Include="Contract.cs" />
     <Compile Include="ICanCall.cs" />
     <Compile Include="IConnectable.cs" />

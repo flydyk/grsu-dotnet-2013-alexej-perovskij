@@ -8,7 +8,9 @@ namespace ATS
 {
     public interface ICanCall
     {
-        void Call();
-        void Abbort();
+        void Call(long number);
+        void Abort();
+        void RecieveCall();
+        event EventHandler<BellEventArgs> Bell;
     }
 }

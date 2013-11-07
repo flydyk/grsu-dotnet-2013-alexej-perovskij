@@ -8,6 +8,7 @@ namespace ATS
 {
     public interface IConnectable:IHaveConnection
     {
-        void Disconnect(IHaveConnection device);
+        bool ConnectTo(IHaveConnection device);
+        bool Disconnect();
     }
 }

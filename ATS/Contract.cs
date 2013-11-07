@@ -8,12 +8,29 @@ namespace ATS
 {
     public class Contract
     {
-        private Telephone telephone;
+        private int portID;
 
-        public Telephone Telephone
+        public int PortID
         {
-            get { return telephone; }
-            set { telephone = value; }
+            get { return portID; }
+            set { portID = value; }
+        }
+
+        private int standID;
+
+        public int StandID
+        {
+            get { return standID; }
+            set { standID = value; }
+        }
+
+
+        private int telephoneID;
+
+        public int TelephoneID
+        {
+            get { return telephoneID; }
+            set { telephoneID = value; }
         }
 
         private Subscriber subscriber;

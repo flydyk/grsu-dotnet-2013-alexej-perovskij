@@ -6,21 +6,24 @@ using System.Threading.Tasks;
 
 namespace ATS
 {
-    public class Port:IHaveConnection
+    public class Port : IHaveConnection
     {
         int id;
-        
         public bool IsBusy { get; set; }
         IHaveConnection dev = null;
+        public event EventHandler<IncommingCallEventArgs> IncommingCall;
 
         public Port(int id)
         {
             ID = id;
         }
-        public bool Connected 
+
+        public void RecieveCall(long number)
         {
-            get { return dev != null; }
+            IncommingCall(this, new IncommingCallEventArgs(number));
         }
+        public void OutCommingCall() { }
+
         public int ID
         {
             get { return id; }
@@ -31,12 +34,24 @@ namespace ATS
                 else throw new ArgumentOutOfRangeException("ID value must be greater than zero");
             }
         }
+        
 
-
-        public void Connect(IHaveConnection device)
+        public bool Connected
         {
-            if (!device.Connected && !Connected)
-                dev = device;
+            get { return dev != null; }
+        }
+
+        public IHaveConnection ConnectedDevice
+        {
+            get
+            {
+                return dev;
+            }
+            set
+            {
+                dev = value;
+            }
         }
     }
+
 }
