@@ -10,7 +10,9 @@ namespace ATS
     {
         int id;
         Dictionary<int, ATSStand> stands;
-        
+        Dictionary<TelephoneNumber, Contract> contracts;
+        TelephoneNumber newTelephoneNumber;
+
         public string Owner { get; set; }
 
         public ATS(int id, string owner)
@@ -18,6 +20,10 @@ namespace ATS
             Owner = owner;
             ID = id;
             stands = new Dictionary<int, ATSStand>();
+            stands.Add(0, new ATSStand(0));
+            newTelephoneNumber = new TelephoneNumber();
+            newTelephoneNumber.PortID = 0;
+            newTelephoneNumber.StandID = 0;
         }
 
         public void AddStand(ATSStand stand)
@@ -34,7 +40,7 @@ namespace ATS
 
         public Telephone SignContract(Subscriber sub, Tarrif tarrif)
         {
-            TelephoneNumber number=GetTelephoneNumber();
+            TelephoneNumber number = GetTelephoneNumber();
             Contract c = new Contract()
             {
                 Subscriber = sub,
@@ -44,14 +50,30 @@ namespace ATS
                 PortID = number.PortID,
                 StandID = number.StandID
             };
-
+            this[c.StandID][c.PortID].IncommingCall += ATS_IncommingCall;
             return new Telephone(c.TelephoneID, c.TelephoneNumber);
-            
+
+        }
+
+        void ATS_IncommingCall(object sender, CallEventArgs e)
+        {
+            Port p = this[e.ToNumber.StandID][e.ToNumber.PortID];
+            if (p.IsBusy)
+            {
+
+            }
+            else
+            {
+
+            };
         }
 
         private TelephoneNumber GetTelephoneNumber()
         {
-            throw new NotImplementedException();
+            newTelephoneNumber.PortID = (newTelephoneNumber.PortID + 1) % ATSStand.PORTS_COUNT;
+            if (newTelephoneNumber.PortID == 0) newTelephoneNumber.StandID++;
+
+            return newTelephoneNumber;
         }
         /// <summary>
         /// Get ATSStand by ID 
@@ -75,11 +97,11 @@ namespace ATS
         }
     }
 
-    public class IncommingCallEventArgs:EventArgs
+    public class CallEventArgs:EventArgs
     {
-        readonly TelephoneNumber FromNumber;
-        readonly TelephoneNumber ToNumber;
-        public IncommingCallEventArgs(TelephoneNumber thisNumber, TelephoneNumber thatNumber)
+        public readonly TelephoneNumber FromNumber;
+        public readonly TelephoneNumber ToNumber;
+        public CallEventArgs(TelephoneNumber thisNumber, TelephoneNumber thatNumber)
         {
             FromNumber = thisNumber;
             ToNumber = thatNumber;

@@ -10,7 +10,7 @@ namespace ATS
     {
         int id;
         Dictionary<int,Port> ports;
-        const int PORTS_COUNT = 20;
+        public const int PORTS_COUNT = 20;
 
         public ATSStand(int id)
         {

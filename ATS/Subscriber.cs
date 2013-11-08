@@ -26,17 +26,12 @@ namespace ATS
             }
         }
 
-        public void Call(int number)
-        {
-            throw new NotImplementedException();
-        }
-
         public void Abort()
         {
             throw new NotImplementedException();
         }
 
-        public void Call(long number)
+        public void Call(TelephoneNumber number)
         {
             throw new NotImplementedException();
         }

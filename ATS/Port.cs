@@ -11,7 +11,8 @@ namespace ATS
         int id;
         public bool IsBusy { get; set; }
         IConnectable dev = null;
-        public event EventHandler<IncommingCallEventArgs> IncommingCall;
+        public event EventHandler<CallEventArgs> IncommingCall;
+        
 
         public Port(int id)
         {
@@ -20,9 +21,10 @@ namespace ATS
 
         public void RecieveCall(TelephoneNumber thisNumber, TelephoneNumber thatNumber)
         {
-            IncommingCall(this, new IncommingCallEventArgs(thisNumber, thatNumber));
+            IsBusy = true;
+            IncommingCall(this, new CallEventArgs(thisNumber, thatNumber));
         }
-        public void OutCommingCall() { }
+        public void GenerateCall() { }
 
         public int ID
         {
