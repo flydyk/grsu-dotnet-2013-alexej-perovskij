@@ -6,9 +6,12 @@ using System.Threading.Tasks;
 
 namespace ATS
 {
-    public interface IConnectable:IHaveConnection
+    public interface IConnectable
     {
-        bool ConnectTo(IHaveConnection device);
+        bool ConnectTo(IConnectable device);
         bool Disconnect();
+
+        IConnectable ConnectedDevice { get; }
+        bool Connected { get; }
     }
 }

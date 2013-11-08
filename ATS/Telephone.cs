@@ -9,60 +9,20 @@ namespace ATS
     public class Telephone : IConnectable,ICanCall
     {
         int id;
-        long telephoneNumber;
+        TelephoneNumber telephoneNumber;
         Port port;
 
-        public Telephone(int id, long number)
+        public Telephone(int id, TelephoneNumber number)
         {
             ID = id;
             TelephoneNumber = number;
         }
 
-        public bool ConnectTo(IHaveConnection device)
-        {
-            Port dev = device as Port;
-            if (dev == null) return false;
-
-            if (!Connected && !dev.Connected)
-            {
-                port = dev;
-                port.ConnectedDevice = this;
-            }
-            return true;
-        }
-
-        public bool Disconnect()
-        {
-            if (Connected)
-            {
-                port.ConnectedDevice = null;
-                port = null;
-                return true;
-            }
-            return false;
-        }
-
-
-        public bool Connected
-        {
-            get { return port != null; }
-        }
-
-        public IHaveConnection ConnectedDevice
-        {
-            get { return port; }
-            set { }
-        }
-
-        public long TelephoneNumber
+        public TelephoneNumber TelephoneNumber
         {
             get { return telephoneNumber; }
             set
-            {
-                if (value < 0)
-                    throw new ArgumentException();
-                else telephoneNumber = value;
-            }
+            { telephoneNumber = value; }
         }
 
         public int ID
@@ -76,11 +36,57 @@ namespace ATS
             }
         }
 
-        public void Call(long number)
+
+        #region IConnactable
+        public bool ConnectTo(IConnectable device)
+        {
+            if (Connected) return false;
+
+            Port dev = device as Port;
+            if (dev == null) return false;
+
+            port = dev;
+            if (port.ConnectedDevice == this) return true;
+
+            if (!dev.ConnectTo(this))
+            {
+                port = null;
+                return false;
+            }
+            return true;
+        }
+
+        public bool Disconnect()
+        {
+            if (Connected)
+            {
+                Port temp = port;
+                port = null;
+                temp.Disconnect();
+                temp = null;
+                return true;
+            }
+            return false;
+        }
+
+
+        public bool Connected
+        {
+            get { return port != null; }
+        }
+
+        public IConnectable ConnectedDevice
+        {
+            get { return port; }
+        }
+        #endregion
+
+
+        public void Call(TelephoneNumber number)
         {
             if(Connected)
             {
-                port.RecieveCall(number);
+                port.RecieveCall(TelephoneNumber,number);
             }
         }
 

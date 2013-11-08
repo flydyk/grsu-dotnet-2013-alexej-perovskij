@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace ATS
 {
-    public class Port : IHaveConnection
+    public class Port : IConnectable
     {
         int id;
         public bool IsBusy { get; set; }
-        IHaveConnection dev = null;
+        IConnectable dev = null;
         public event EventHandler<IncommingCallEventArgs> IncommingCall;
 
         public Port(int id)
@@ -18,9 +18,9 @@ namespace ATS
             ID = id;
         }
 
-        public void RecieveCall(long number)
+        public void RecieveCall(TelephoneNumber thisNumber, TelephoneNumber thatNumber)
         {
-            IncommingCall(this, new IncommingCallEventArgs(number));
+            IncommingCall(this, new IncommingCallEventArgs(thisNumber, thatNumber));
         }
         public void OutCommingCall() { }
 
@@ -34,24 +34,47 @@ namespace ATS
                 else throw new ArgumentOutOfRangeException("ID value must be greater than zero");
             }
         }
-        
+
+        #region IConnectable
+        public bool ConnectTo(IConnectable device)
+        {
+            if (Connected) return false;
+
+            dev = device;
+            if (dev.ConnectedDevice == this) return true;
+
+            if (!device.ConnectTo(this))
+            {
+                dev = null;
+                return false;
+            }
+            return true;
+        }
+
+        public bool Disconnect()
+        {
+            if (Connected)
+            {
+                IConnectable temp = dev;
+                dev = null;
+                temp.Disconnect();
+                temp = null;
+                return true;
+            }
+            return false;
+        }
 
         public bool Connected
         {
             get { return dev != null; }
         }
 
-        public IHaveConnection ConnectedDevice
+        public IConnectable ConnectedDevice
         {
-            get
-            {
-                return dev;
-            }
-            set
-            {
-                dev = value;
-            }
+            get { return dev; }
         }
+        #endregion
+
     }
 
 }
