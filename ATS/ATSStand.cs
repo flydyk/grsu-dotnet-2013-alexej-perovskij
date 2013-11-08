@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ATS
 {
-    public class ATSStand
+    public class ATSStand:IEnumerable<Port>
     {
         int id;
         Dictionary<int,Port> ports;
@@ -46,6 +46,19 @@ namespace ATS
         public Port this[int id]
         {
             get { return ports[id]; }
+        }
+
+        public IEnumerator<Port> GetEnumerator()
+        {
+            foreach (int item in ports.Keys)
+            {
+                yield return ports[item];
+            }
+        }
+
+        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+        {
+            return ports.Values.GetEnumerator();
         }
     }
 }

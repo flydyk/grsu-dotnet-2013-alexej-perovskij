@@ -32,9 +32,26 @@ namespace ATS
             stands.Remove(id);
         }
 
-        public void SignContract(Subscriber sub, Tarrif tarrif)
+        public Telephone SignContract(Subscriber sub, Tarrif tarrif)
         {
+            TelephoneNumber number=GetTelephoneNumber();
+            Contract c = new Contract()
+            {
+                Subscriber = sub,
+                Tarrif = tarrif,
+                TelephoneID = 0,
+                TelephoneNumber = number,
+                PortID = number.PortID,
+                StandID = number.StandID
+            };
 
+            return new Telephone(c.TelephoneID, c.TelephoneNumber);
+            
+        }
+
+        private TelephoneNumber GetTelephoneNumber()
+        {
+            throw new NotImplementedException();
         }
         /// <summary>
         /// Get ATSStand by ID 
@@ -60,10 +77,12 @@ namespace ATS
 
     public class IncommingCallEventArgs:EventArgs
     {
-        readonly long Number;
-        public IncommingCallEventArgs(long number)
+        readonly TelephoneNumber FromNumber;
+        readonly TelephoneNumber ToNumber;
+        public IncommingCallEventArgs(TelephoneNumber thisNumber, TelephoneNumber thatNumber)
         {
-            Number = number;
+            FromNumber = thisNumber;
+            ToNumber = thatNumber;
         }
     }
 }

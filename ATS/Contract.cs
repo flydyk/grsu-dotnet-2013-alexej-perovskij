@@ -24,6 +24,14 @@ namespace ATS
             set { standID = value; }
         }
 
+        private TelephoneNumber telephoneNumber;
+
+        public TelephoneNumber TelephoneNumber
+        {
+            get { return telephoneNumber; }
+            set { telephoneNumber = value; }
+        }
+
 
         private int telephoneID;
 
