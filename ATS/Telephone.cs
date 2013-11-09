@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace ATS
 {
+    
     public class Telephone : IConnectable,ICallingDevice
     {
         int id;
@@ -128,10 +129,10 @@ namespace ATS
 
         public void RecieveCall(Subscriber taker,Subscriber caller)
         {
-            port.GenRecieveCallBack(taker,caller);
+            port.GenAcceptCallBack(taker,caller);
         }
 
-
+        
         public void RecieveCall(Subscriber caller)
         {
             throw new NotImplementedException();

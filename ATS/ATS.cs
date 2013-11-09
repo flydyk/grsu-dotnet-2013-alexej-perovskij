@@ -19,9 +19,7 @@ namespace ATS
         Dictionary<int, ATSStand> stands;
         Dictionary<TelephoneNumber, Contract> contracts;
         Dictionary<TelephoneNumber, List<Session>> statistics;
-        TelephoneNumber newTelephoneNumber;
-
-
+        TelephoneNumber newTelephoneNumber = TelephoneNumber.Empty;
         public string Owner { get; set; }
 
         public ATS(int id, string owner)
@@ -32,47 +30,53 @@ namespace ATS
             statistics = new Dictionary<TelephoneNumber, List<Session>>();
 
             stands = new Dictionary<int, ATSStand>();
-            stands.Add(0, new ATSStand(0));
-            newTelephoneNumber = new TelephoneNumber();
-            newTelephoneNumber.PortID = 0;
-            newTelephoneNumber.StandID = 0;
         }
 
-        public void AddStand(ATSStand stand)
+        public void AddStand()
+        {
+            stands.Add(stands.Count, new ATSStand(stands.Count));
+        }
+        /*
+        private void AddStand(ATSStand stand)
         {
             if (!stands.ContainsKey(stand.ID))
                 stands[stand.ID] = stand;
             else throw new ArgumentException(
                 string.Format("Stand with ID: {0} already exists.", stand.ID));
         }
+        */
+
         public void RemoveStand(int id)
         {
             stands.Remove(id);
         }
 
-        public Contract SignContract(Subscriber sub, Tarrif tarrif)
+        public Contract SignContract(Subscriber sub, Tarrifs tarrif)
         {
             TelephoneNumber number = GetTelephoneNumber();
             Contract contract = new Contract()
             {
                 Subscriber = sub,
-                Tarrif = tarrif,
+                Tarrif = new Tarrif(tarrif),
                 Telephone = new Telephone(number),
                 PortID = number.PortID,
-                StandID = number.StandID
+                StandID = number.StandID,
+                PayTime = DateTime.Now,
+                ATS = this
             };
             sub.Contract = contract;
             sub.Telephone = contract.Telephone;
 
+            // configure ports
             this[contract.StandID][contract.PortID].IncommingCall += ATS_IncommingCall;
             this[contract.StandID][contract.PortID].AbortCall += ATS_AbortCall;
-            this[contract.StandID][contract.PortID].RecieveCallBack += ATS_RecieveCallBack;
+            this[contract.StandID][contract.PortID].AcceptCallBack += ATS_AcceptCallBack;
             
             contracts.Add(number, contract);
             return contract;
         }
 
-        void ATS_RecieveCallBack(object sender, CallBackEventArgs e)
+        void ATS_AcceptCallBack(object sender, CallBackEventArgs e)
         {
             Session s = new Session(1)
                 {
@@ -106,10 +110,6 @@ namespace ATS
                         port = s.Caller.Contract.PortID;
                         stand = s.Caller.Contract.StandID;
                         this[stand][port].GenCallBack(false);
-                        /*statistics[e.Caller].EndTime = DateTime.Now;
-                        int port = statistics[e.Caller].Taker.Contract.PortID;
-                        int stand = statistics[e.Caller].Taker.Contract.StandID;
-                        this[stand][port].GenCallBack(false);*/
                     }
                     else 
                     {
@@ -136,10 +136,15 @@ namespace ATS
             };
         }
 
-        private TelephoneNumber GetTelephoneNumber()
+        TelephoneNumber GetTelephoneNumber()
         {
             newTelephoneNumber.PortID = (newTelephoneNumber.PortID + 1) % ATSStand.PORTS_COUNT;
-            if (newTelephoneNumber.PortID == 0) newTelephoneNumber.StandID++;
+            if (newTelephoneNumber.PortID == 0)
+                newTelephoneNumber.StandID++;
+            
+            // add one more stand to this station if required
+            if (newTelephoneNumber.StandID == stands.Count)
+                stands.Add(newTelephoneNumber.StandID, new ATSStand(newTelephoneNumber.StandID));
 
             return newTelephoneNumber;
         }
@@ -151,6 +156,29 @@ namespace ATS
             else return new List<Session>();
         }
 
+        public List<Session> SessionsFilteredByName(TelephoneNumber number, string name)
+        {
+            var sessions = from session in GetSessions(number)
+                           where session.Taker.Name == name
+                           select session;
+            return sessions.ToList();
+        }
+
+        public List<Session> SessionsFilteredByCost(TelephoneNumber number, int lowBound, int highBound)
+        {
+            var sessions = from session in GetSessions(number)
+                           where session.Cost >= lowBound && session.Cost <= highBound
+                           select session;
+            return sessions.ToList();
+        }
+
+        public List<Session> SessionsFilteredByDate(TelephoneNumber number, DateTime lowBound, DateTime highBound)
+        {
+            var sessions = from session in GetSessions(number)
+                           where session.EndTime >= lowBound && session.EndTime <= highBound
+                           select session;
+            return sessions.ToList();
+        }
         /// <summary>
         /// Get ATSStand by ID 
         /// </summary>

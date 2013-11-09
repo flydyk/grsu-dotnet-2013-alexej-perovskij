@@ -12,14 +12,14 @@ namespace ATS
         static void Main(string[] args)
         {
             ATS ats = new ATS(10, "Owner");
-            ats.AddStand(new ATSStand(1));
+            ats.AddStand();
             Subscriber s1 = new Subscriber(1, "Alexey", "Grodno");
             Subscriber s2 = new Subscriber(2, "George", "New-York");
             Subscriber s3 = new Subscriber(2, "Paolo", "Brazilia");
             List<Subscriber> subs = new List<Subscriber>() { s1, s2, s3 };
-            ats.SignContract(s1, new Tarrif(Tarrifs.Cheap));
-            ats.SignContract(s2, new Tarrif(Tarrifs.Middle));
-            ats.SignContract(s3, new Tarrif(Tarrifs.Expensive));
+            ats.SignContract(s1, Tarrifs.Cheap);
+            ats.SignContract(s2, Tarrifs.Middle);
+            ats.SignContract(s3, Tarrifs.Expensive);
 
             s1.Telephone.ConnectTo(ats[s1.Contract.StandID][s1.Contract.PortID]);
             s2.Telephone.ConnectTo(ats[s2.Contract.StandID][s2.Contract.PortID]);
@@ -27,21 +27,21 @@ namespace ATS
             //1
             s1.Call(s2.Telephone.TelephoneNumber);
             Thread.Sleep(2000);
-            //s2.Abort();
+            s2.Abort();
             //2
             s3.Call(s1.Telephone.TelephoneNumber);
             Thread.Sleep(3000);
-            //s3.Abort();
+            s3.Abort();
             //3
             s3.Call(s2.Telephone.TelephoneNumber);
             Thread.Sleep(2000);
-            //s2.Abort();
-            
+            s2.Abort();
+
             //ats.SignContract
             foreach (var sub in subs)
             {
-                Console.WriteLine("Statistic of: {0}",sub.Name);
-                foreach (var session in ats.GetSessions(sub.Telephone.TelephoneNumber))
+                Console.WriteLine("Statistic of: {0}", sub.Name);
+                foreach (var session in sub.GetSessions())
                 {
                     Console.WriteLine(session.ToString());
                 }

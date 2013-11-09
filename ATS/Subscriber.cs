@@ -90,7 +90,22 @@ namespace ATS
 
 
 
-
+        public List<Session> GetSessions()
+        {
+            return Contract.ATS.GetSessions(Telephone.TelephoneNumber);
+        }
+        public List<Session> SessionsFilteredByName(string name)
+        {
+            return Contract.ATS.SessionsFilteredByName(Telephone.TelephoneNumber, name);
+        }
+        public List<Session> SessionsFilteredByCost(int lowBound, int highBound)
+        {
+            return Contract.ATS.SessionsFilteredByCost(Telephone.TelephoneNumber, lowBound, highBound);
+        }
+        public List<Session> SessionsFilteredByDate(DateTime lowBound, DateTime highBound)
+        {
+            return Contract.ATS.SessionsFilteredByDate(Telephone.TelephoneNumber, lowBound, highBound);
+        }
 
     }
 }

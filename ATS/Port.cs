@@ -15,7 +15,7 @@ namespace ATS
         public event EventHandler<CallBackEventArgs> CallBack;
         public event EventHandler<AbortCallEventArgs> AbortCall;
         public event EventHandler<BellEventArgs> GenerateCall;
-        public event EventHandler<CallBackEventArgs> RecieveCallBack;
+        public event EventHandler<CallBackEventArgs> AcceptCallBack;
 
         public Port(int id)
         {
@@ -58,12 +58,12 @@ namespace ATS
             }
         }
 
-        public void GenRecieveCallBack(Subscriber taker, Subscriber caller)
+        public void GenAcceptCallBack(Subscriber taker, Subscriber caller)
         {
-            if (RecieveCallBack != null)
+            if (AcceptCallBack != null)
             {
                 CallBackEventArgs e = new CallBackEventArgs(true, caller, taker);
-                RecieveCallBack(this, e);
+                AcceptCallBack(this, e);
             }
         }
 
