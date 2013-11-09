@@ -31,11 +31,12 @@ namespace ATS
             this.portID = portID;
             this.standID = standID;
         }
-        /*
-        public static TelephoneNumber EmptyNumber
+
+
+        public override string ToString()
         {
-            get { return new TelephoneNumber(0, 0); }
-        }*/
+            return string.Format("{0}-{1}", StandID, PortID);
+        }
 
         public int CompareTo(TelephoneNumber other)
         {

@@ -112,6 +112,7 @@ namespace ATS
 
         private void RecieveCall(object sender, BellEventArgs e)
         {
+            currentCaller = e.CallingSubscriber.Telephone.TelephoneNumber;
             Bell(this, e);
         }
 
@@ -119,8 +120,9 @@ namespace ATS
 
         void port_CallBack(object sender, CallBackEventArgs e)
         {
-            Console.WriteLine(e.Accepted);
-                
+            Console.WriteLine("Line is free or end of conversaition on {1}: {0}",
+                !e.Accepted, TelephoneNumber.ToString());
+
         }
 
 

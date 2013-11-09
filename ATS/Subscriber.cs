@@ -79,7 +79,8 @@ namespace ATS
 
         private void ListenCall(object sender, BellEventArgs e)
         {
-            Console.Write("{0} is calling\nRecieve call? (y/n)", e.CallingSubscriber.Name);
+            Console.Write("{0} is calling to {1}\nRecieve call? (y/n)",
+                e.CallingSubscriber.Name, Name);
             string todo = Console.ReadLine();
             if (todo == "y")
                 RecieveCall(e.CallingSubscriber);

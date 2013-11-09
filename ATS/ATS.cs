@@ -103,10 +103,17 @@ namespace ATS
                         int port = s.Taker.Contract.PortID;
                         int stand = s.Taker.Contract.StandID;
                         this[stand][port].GenCallBack(false);
+                        port = s.Caller.Contract.PortID;
+                        stand = s.Caller.Contract.StandID;
+                        this[stand][port].GenCallBack(false);
                         /*statistics[e.Caller].EndTime = DateTime.Now;
                         int port = statistics[e.Caller].Taker.Contract.PortID;
                         int stand = statistics[e.Caller].Taker.Contract.StandID;
                         this[stand][port].GenCallBack(false);*/
+                    }
+                    else 
+                    {
+                        this[e.Caller.StandID][e.Caller.PortID].GenCallBack(false);
                     }
                     break;
                 default:
