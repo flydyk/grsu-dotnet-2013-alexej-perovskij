@@ -11,10 +11,16 @@ namespace ATS
         int id;
         public string Name { get; set; }
         public string Address { get; set; }
-        public Contract MyContract { get; set; }
-
+        public Contract Contract { get; set; }
 
         private Telephone telephone;
+
+        public Subscriber(int id, string name, string address)
+        {
+            ID = id;
+            Name = name;
+            Address = address;
+        }
 
         public Telephone Telephone
         {
@@ -66,19 +72,21 @@ namespace ATS
             Telephone.Call(number);
         }
 
-        public void RecieveCall()
+        public void RecieveCall(Subscriber caller)
         {
-
+            telephone.RecieveCall(this, caller);
         }
 
-        public void ListenCall(object sender, BellEventArgs e)
+        private void ListenCall(object sender, BellEventArgs e)
         {
-            if (e.CallingSubscriber != null)
-            {
-                RecieveCall();
-            }
-            else Abort();
+            Console.Write("{0} is calling\nRecieve call? (y/n)", e.CallingSubscriber.Name);
+            string todo = Console.ReadLine();
+            if (todo == "y")
+                RecieveCall(e.CallingSubscriber);
+            else
+                Abort();
         }
+
 
 
 

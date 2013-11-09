@@ -10,6 +10,7 @@ namespace ATS
     {
         int id;
         TelephoneNumber telephoneNumber;
+        TelephoneNumber currentCaller = TelephoneNumber.Empty;
         Port port;
 
         public Telephone(TelephoneNumber number)
@@ -55,6 +56,7 @@ namespace ATS
             }
             port.GenerateCall += RecieveCall;
             port.CallBack += port_CallBack;
+
             return true;
         }
 
@@ -93,6 +95,7 @@ namespace ATS
         {
             if(Connected)
             {
+                currentCaller = telephoneNumber;
                 port.RecieveCall(TelephoneNumber,number);
             }
         }
@@ -101,7 +104,8 @@ namespace ATS
         {
             if(Connected)
             {
-                
+                port.Abort(AbortReason.Subsriber, currentCaller);
+                currentCaller = TelephoneNumber.Empty;
             }
         }
 
@@ -115,12 +119,18 @@ namespace ATS
 
         void port_CallBack(object sender, CallBackEventArgs e)
         {
-            if (e.Success) ;
+            Console.WriteLine(e.Accepted);
                 
         }
 
 
-        public void RecieveCall()
+        public void RecieveCall(Subscriber taker,Subscriber caller)
+        {
+            port.GenRecieveCallBack(taker,caller);
+        }
+
+
+        public void RecieveCall(Subscriber caller)
         {
             throw new NotImplementedException();
         }

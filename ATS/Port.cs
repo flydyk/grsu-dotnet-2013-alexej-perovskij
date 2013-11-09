@@ -15,6 +15,7 @@ namespace ATS
         public event EventHandler<CallBackEventArgs> CallBack;
         public event EventHandler<AbortCallEventArgs> AbortCall;
         public event EventHandler<BellEventArgs> GenerateCall;
+        public event EventHandler<CallBackEventArgs> RecieveCallBack;
 
         public Port(int id)
         {
@@ -34,23 +35,36 @@ namespace ATS
             Telephone t = dev as Telephone;
             if (t != null && GenerateCall != null)
             {
+                IsBusy = true;
                 GenerateCall(this, new BellEventArgs(sub));
             }
         }
 
-        public void Abort(AbortReason reason)
+        public void Abort(AbortReason reason,TelephoneNumber caller)
         {
             if (AbortCall != null)
             {
                 IsBusy = false;
-                AbortCall(this, new AbortCallEventArgs(reason));
+                AbortCall(this, new AbortCallEventArgs(reason,caller));
             }
         }
 
         public void GenCallBack(bool success)
         {
             if (CallBack != null)
-                CallBack(this, new CallBackEventArgs(success));
+            {
+                IsBusy = success;
+                CallBack(this, new CallBackEventArgs(success, null, null));
+            }
+        }
+
+        public void GenRecieveCallBack(Subscriber taker, Subscriber caller)
+        {
+            if (RecieveCallBack != null)
+            {
+                CallBackEventArgs e = new CallBackEventArgs(true, caller, taker);
+                RecieveCallBack(this, e);
+            }
         }
 
         public int ID

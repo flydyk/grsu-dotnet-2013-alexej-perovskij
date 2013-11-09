@@ -18,6 +18,7 @@ namespace ATS
         int id;
         Dictionary<int, ATSStand> stands;
         Dictionary<TelephoneNumber, Contract> contracts;
+        Dictionary<TelephoneNumber, List<Session>> statistics;
         TelephoneNumber newTelephoneNumber;
 
 
@@ -27,6 +28,9 @@ namespace ATS
         {
             Owner = owner;
             ID = id;
+            contracts = new Dictionary<TelephoneNumber, Contract>();
+            statistics = new Dictionary<TelephoneNumber, List<Session>>();
+
             stands = new Dictionary<int, ATSStand>();
             stands.Add(0, new ATSStand(0));
             newTelephoneNumber = new TelephoneNumber();
@@ -57,13 +61,32 @@ namespace ATS
                 PortID = number.PortID,
                 StandID = number.StandID
             };
-            sub.MyContract = contract;
+            sub.Contract = contract;
             sub.Telephone = contract.Telephone;
 
             this[contract.StandID][contract.PortID].IncommingCall += ATS_IncommingCall;
             this[contract.StandID][contract.PortID].AbortCall += ATS_AbortCall;
-
+            this[contract.StandID][contract.PortID].RecieveCallBack += ATS_RecieveCallBack;
+            
+            contracts.Add(number, contract);
             return contract;
+        }
+
+        void ATS_RecieveCallBack(object sender, CallBackEventArgs e)
+        {
+            Session s = new Session(1)
+                {
+                    Caller = e.Caller,
+                    Taker = e.Taker,
+                    StartTime = DateTime.Now,
+                };
+
+            if (!statistics.ContainsKey(s.Caller.Telephone.TelephoneNumber))
+            {
+                List<Session> ses = new List<Session>();
+                statistics.Add(s.Caller.Telephone.TelephoneNumber, ses);
+            }
+            statistics[s.Caller.Telephone.TelephoneNumber].Add(s);
         }
 
         void ATS_AbortCall(object sender, AbortCallEventArgs e)
@@ -72,11 +95,19 @@ namespace ATS
             {
                 case AbortReason.ATS:
                     break;
-                case AbortReason.BusyLine:
-                    Port fromPort = sender as Port;
-                    fromPort.GenCallBack(false);
-                    break;
                 case AbortReason.Subsriber:
+                    if (statistics.ContainsKey(e.Caller))
+                    {
+                        Session s = statistics[e.Caller][statistics[e.Caller].Count - 1];
+                        s.EndTime = DateTime.Now;
+                        int port = s.Taker.Contract.PortID;
+                        int stand = s.Taker.Contract.StandID;
+                        this[stand][port].GenCallBack(false);
+                        /*statistics[e.Caller].EndTime = DateTime.Now;
+                        int port = statistics[e.Caller].Taker.Contract.PortID;
+                        int stand = statistics[e.Caller].Taker.Contract.StandID;
+                        this[stand][port].GenCallBack(false);*/
+                    }
                     break;
                 default:
                     break;
@@ -89,7 +120,7 @@ namespace ATS
             Port fromPort = (Port)sender;
             if (toPort.IsBusy)
             {
-                fromPort.Abort(AbortReason.BusyLine);
+                fromPort.GenCallBack(false);
             }
             else
             {
@@ -105,6 +136,14 @@ namespace ATS
 
             return newTelephoneNumber;
         }
+
+        public List<Session> GetSessions(TelephoneNumber number)
+        {
+            if (statistics.ContainsKey(number))
+                return new List<Session>(statistics[number]);
+            else return new List<Session>();
+        }
+
         /// <summary>
         /// Get ATSStand by ID 
         /// </summary>
@@ -127,6 +166,9 @@ namespace ATS
         }
     }
 
+
+
+
     public class CallEventArgs:EventArgs
     {
         public readonly TelephoneNumber FromNumber;
@@ -141,20 +183,25 @@ namespace ATS
 
     public class CallBackEventArgs : EventArgs
     {
-        public readonly bool Success;
-
-        public CallBackEventArgs(bool success)
+        public readonly bool Accepted;
+        public readonly Subscriber Caller;
+        public readonly Subscriber Taker;
+        public CallBackEventArgs(bool accepted,Subscriber caller,Subscriber taker)
         {
-            Success = success;
+            Caller = caller;
+            Taker = taker;
+            Accepted = accepted;
         }
     }
 
     public class AbortCallEventArgs : EventArgs
     {
         public readonly AbortReason Reason;
+        public readonly TelephoneNumber Caller;
 
-        public AbortCallEventArgs(AbortReason reason)
+        public AbortCallEventArgs(AbortReason reason,TelephoneNumber caller)
         {
+            Caller = caller;
             Reason = reason;
         }
     }
@@ -168,4 +215,15 @@ namespace ATS
             CallingSubscriber = s;
         }
     }
+    /*
+    public class RecieveCallBackEventArgs : EventArgs
+    {
+        public readonly bool Accepted;
+        public readonly Session Session;
+        public RecieveCallBackEventArgs(bool accepted,Session session)
+        {
+            Session = session;
+            Accepted = accepted;
+        }
+    }*/
 }

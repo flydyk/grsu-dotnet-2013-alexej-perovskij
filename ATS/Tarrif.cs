@@ -15,9 +15,9 @@ namespace ATS
 
     public class Tarrif
     {
-        readonly int MonthCost;
-        readonly int MinuteCost;
-        readonly bool Unlimited = false;
+        public readonly int MonthCost;
+        public readonly int MinuteCost;
+        public readonly bool Unlimited = false;
         Tarrifs tarrif;
 
         public Tarrif(Tarrifs tarrif)
