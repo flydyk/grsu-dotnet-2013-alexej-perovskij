@@ -6,15 +6,15 @@ using System.Threading.Tasks;
 
 namespace ATS
 {
-    public class Telephone : IConnectable,ICanCall
+    public class Telephone : IConnectable,ICallingDevice
     {
         int id;
         TelephoneNumber telephoneNumber;
         Port port;
 
-        public Telephone(int id, TelephoneNumber number)
+        public Telephone(TelephoneNumber number)
         {
-            ID = id;
+            ID = number.PortID + number.StandID * 100;
             TelephoneNumber = number;
         }
 
@@ -53,8 +53,12 @@ namespace ATS
                 port = null;
                 return false;
             }
+            port.GenerateCall += RecieveCall;
+            port.CallBack += port_CallBack;
             return true;
         }
+
+        
 
         public bool Disconnect()
         {
@@ -63,6 +67,9 @@ namespace ATS
                 Port temp = port;
                 port = null;
                 temp.Disconnect();
+
+                temp.GenerateCall -= RecieveCall;
+                temp.CallBack -= port_CallBack;
                 temp = null;
                 return true;
             }
@@ -92,7 +99,24 @@ namespace ATS
 
         public void Abort()
         {
-            throw new NotImplementedException();
+            if(Connected)
+            {
+                
+            }
+        }
+
+
+        private void RecieveCall(object sender, BellEventArgs e)
+        {
+            Bell(this, e);
+        }
+
+        public event EventHandler<BellEventArgs> Bell;
+
+        void port_CallBack(object sender, CallBackEventArgs e)
+        {
+            if (e.Success) ;
+                
         }
 
 
@@ -100,8 +124,5 @@ namespace ATS
         {
             throw new NotImplementedException();
         }
-
-        public event EventHandler<BellEventArgs> Bell;
-
     }
 }

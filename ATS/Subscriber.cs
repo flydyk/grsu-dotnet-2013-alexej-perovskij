@@ -6,14 +6,44 @@ using System.Threading.Tasks;
 
 namespace ATS
 {
-    public class Subscriber:ICanCall
+    public class Subscriber : ICanCall
     {
         int id;
         public string Name { get; set; }
         public string Address { get; set; }
-        public Telephone telephone;
+        public Contract MyContract { get; set; }
 
 
+        private Telephone telephone;
+
+        public Telephone Telephone
+        {
+            get
+            {
+                return telephone;
+            }
+            set
+            {
+                if (telephone == null && value == null) return;
+                if (telephone == null && value != null)
+                {
+                    telephone = value;
+                    telephone.Bell += ListenCall;
+                }
+                else
+                    if (value == null)
+                    {
+                        telephone.Bell -= ListenCall;
+                        telephone = value;
+                    }
+                    else
+                        if (value != telephone)
+                        {
+                            telephone = value;
+                            telephone.Bell += ListenCall;
+                        }
+            }
+        }
 
         public int ID
         {
@@ -28,19 +58,30 @@ namespace ATS
 
         public void Abort()
         {
-            throw new NotImplementedException();
+            Telephone.Abort();
         }
 
         public void Call(TelephoneNumber number)
         {
-            throw new NotImplementedException();
+            Telephone.Call(number);
         }
 
         public void RecieveCall()
         {
-            throw new NotImplementedException();
+
         }
 
-        public event EventHandler<BellEventArgs> Bell;
+        public void ListenCall(object sender, BellEventArgs e)
+        {
+            if (e.CallingSubscriber != null)
+            {
+                RecieveCall();
+            }
+            else Abort();
+        }
+
+
+
+
     }
 }

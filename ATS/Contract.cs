@@ -41,6 +41,15 @@ namespace ATS
             set { telephoneID = value; }
         }
 
+        private Telephone telephone;
+
+        public Telephone Telephone
+        {
+            get { return telephone; }
+            set { telephone = value; }
+        }
+
+
         private Subscriber subscriber;
 
         public Subscriber Subscriber

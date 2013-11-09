@@ -6,12 +6,20 @@ using System.Threading.Tasks;
 
 namespace ATS
 {
+    public enum AbortReason
+    {
+        ATS,
+        BusyLine,
+        Subsriber
+    }
+
     public class ATS
     {
         int id;
         Dictionary<int, ATSStand> stands;
         Dictionary<TelephoneNumber, Contract> contracts;
         TelephoneNumber newTelephoneNumber;
+
 
         public string Owner { get; set; }
 
@@ -38,33 +46,55 @@ namespace ATS
             stands.Remove(id);
         }
 
-        public Telephone SignContract(Subscriber sub, Tarrif tarrif)
+        public Contract SignContract(Subscriber sub, Tarrif tarrif)
         {
             TelephoneNumber number = GetTelephoneNumber();
-            Contract c = new Contract()
+            Contract contract = new Contract()
             {
                 Subscriber = sub,
                 Tarrif = tarrif,
-                TelephoneID = 0,
-                TelephoneNumber = number,
+                Telephone = new Telephone(number),
                 PortID = number.PortID,
                 StandID = number.StandID
             };
-            this[c.StandID][c.PortID].IncommingCall += ATS_IncommingCall;
-            return new Telephone(c.TelephoneID, c.TelephoneNumber);
+            sub.MyContract = contract;
+            sub.Telephone = contract.Telephone;
 
+            this[contract.StandID][contract.PortID].IncommingCall += ATS_IncommingCall;
+            this[contract.StandID][contract.PortID].AbortCall += ATS_AbortCall;
+
+            return contract;
+        }
+
+        void ATS_AbortCall(object sender, AbortCallEventArgs e)
+        {
+            switch (e.Reason)
+            {
+                case AbortReason.ATS:
+                    break;
+                case AbortReason.BusyLine:
+                    Port fromPort = sender as Port;
+                    fromPort.GenCallBack(false);
+                    break;
+                case AbortReason.Subsriber:
+                    break;
+                default:
+                    break;
+            }
         }
 
         void ATS_IncommingCall(object sender, CallEventArgs e)
         {
-            Port p = this[e.ToNumber.StandID][e.ToNumber.PortID];
-            if (p.IsBusy)
+            Port toPort = this[e.ToNumber.StandID][e.ToNumber.PortID];
+            Port fromPort = (Port)sender;
+            if (toPort.IsBusy)
             {
-
+                fromPort.Abort(AbortReason.BusyLine);
             }
             else
             {
-
+                fromPort.GenCallBack(true);
+                toPort.GenCall(contracts[e.FromNumber].Subscriber);
             };
         }
 
@@ -101,10 +131,41 @@ namespace ATS
     {
         public readonly TelephoneNumber FromNumber;
         public readonly TelephoneNumber ToNumber;
+
         public CallEventArgs(TelephoneNumber thisNumber, TelephoneNumber thatNumber)
         {
             FromNumber = thisNumber;
             ToNumber = thatNumber;
+        }
+    }
+
+    public class CallBackEventArgs : EventArgs
+    {
+        public readonly bool Success;
+
+        public CallBackEventArgs(bool success)
+        {
+            Success = success;
+        }
+    }
+
+    public class AbortCallEventArgs : EventArgs
+    {
+        public readonly AbortReason Reason;
+
+        public AbortCallEventArgs(AbortReason reason)
+        {
+            Reason = reason;
+        }
+    }
+
+    public class BellEventArgs : EventArgs
+    {
+        public readonly Subscriber CallingSubscriber;
+
+        public BellEventArgs(Subscriber s)
+        {
+            CallingSubscriber = s;
         }
     }
 }

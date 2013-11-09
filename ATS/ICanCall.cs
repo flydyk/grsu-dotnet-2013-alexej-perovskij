@@ -11,6 +11,11 @@ namespace ATS
         void Call(TelephoneNumber number);
         void Abort();
         void RecieveCall();
+    }
+
+    public interface ICallingDevice : ICanCall
+    {
+        //void RecieveCall(object sender,BellEventArgs e);
         event EventHandler<BellEventArgs> Bell;
     }
 }
