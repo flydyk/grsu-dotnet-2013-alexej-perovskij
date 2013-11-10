@@ -23,7 +23,7 @@ namespace ATS
             {
                 endTime = value;
                 TalkTime = endTime - StartTime;
-                Cost = Caller.Contract.Tarrif.MinuteCost * TalkTime.Seconds;
+                Cost = Caller.Contract.Tarrif.MinuteCost * TalkTime.Milliseconds;
             }
         }
         
@@ -46,8 +46,8 @@ namespace ATS
 
         public override string ToString()
         {
-            return string.Format("[Subsriber: {0}, TalkTime: {1}, Cost: {2}",
-                Taker.Name, TalkTime.Seconds, Cost);
+            return string.Format("[ Subsriber: {0,15}, TalkTime: {1,4}, Cost: {2,5} ]",
+                Taker.Name, TalkTime.Milliseconds, Cost);
         }
     }
 }

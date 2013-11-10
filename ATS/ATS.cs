@@ -106,14 +106,16 @@ namespace ATS
                         s.EndTime = DateTime.Now;
                         int port = s.Taker.Contract.PortID;
                         int stand = s.Taker.Contract.StandID;
-                        this[stand][port].GenCallBack(false);
+                        CallBackEventArgs cb = new CallBackEventArgs(false, s.Caller, s.Taker);
+                        this[stand][port].GenCallBack(cb);
                         port = s.Caller.Contract.PortID;
                         stand = s.Caller.Contract.StandID;
-                        this[stand][port].GenCallBack(false);
+                        this[stand][port].GenCallBack(cb);
                     }
                     else 
                     {
-                        this[e.Caller.StandID][e.Caller.PortID].GenCallBack(false);
+                        this[e.Caller.StandID][e.Caller.PortID]
+                            .GenCallBack(new CallBackEventArgs(false, contracts[e.Caller].Subscriber, null));
                     }
                     break;
                 default:
@@ -125,14 +127,21 @@ namespace ATS
         {
             Port toPort = this[e.ToNumber.StandID][e.ToNumber.PortID];
             Port fromPort = (Port)sender;
-            if (toPort.IsBusy)
+            Subscriber caller = contracts[e.FromNumber].Subscriber;
+            Subscriber taker=contracts[e.ToNumber].Subscriber;
+            if (toPort.IsBusy||!toPort.Connected)
             {
-                fromPort.GenCallBack(false);
+                fromPort.GenCallBack(new CallBackEventArgs(false, caller, taker));
             }
             else
             {
-                fromPort.GenCallBack(true);
-                toPort.GenCall(contracts[e.FromNumber].Subscriber);
+                fromPort.GenCallBack(
+                    new CallBackEventArgs(
+                        true,
+                        caller,
+                        taker)
+                    );
+                toPort.GenCall(caller);
             };
         }
 

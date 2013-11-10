@@ -49,12 +49,12 @@ namespace ATS
             }
         }
 
-        public void GenCallBack(bool success)
+        public void GenCallBack(CallBackEventArgs e)
         {
             if (CallBack != null)
             {
-                IsBusy = success;
-                CallBack(this, new CallBackEventArgs(success, null, null));
+                IsBusy = e.Accepted;
+                CallBack(this, e);
             }
         }
 

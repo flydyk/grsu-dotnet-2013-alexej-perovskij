@@ -11,7 +11,7 @@ namespace ATS
     {
         int id;
         TelephoneNumber telephoneNumber;
-        TelephoneNumber currentCaller = TelephoneNumber.Empty;
+        TelephoneNumber lastCaller = TelephoneNumber.Empty;
         Port port;
 
         public Telephone(TelephoneNumber number)
@@ -96,7 +96,7 @@ namespace ATS
         {
             if(Connected)
             {
-                currentCaller = telephoneNumber;
+                lastCaller = TelephoneNumber;
                 port.RecieveCall(TelephoneNumber,number);
             }
         }
@@ -105,15 +105,15 @@ namespace ATS
         {
             if(Connected)
             {
-                port.Abort(AbortReason.Subsriber, currentCaller);
-                currentCaller = TelephoneNumber.Empty;
+                port.Abort(AbortReason.Subsriber, lastCaller);
+                //lastCaller = TelephoneNumber.Empty;
             }
         }
 
 
         private void RecieveCall(object sender, BellEventArgs e)
         {
-            currentCaller = e.CallingSubscriber.Telephone.TelephoneNumber;
+            lastCaller = e.CallingSubscriber.Telephone.TelephoneNumber;
             Bell(this, e);
         }
 
@@ -121,9 +121,20 @@ namespace ATS
 
         void port_CallBack(object sender, CallBackEventArgs e)
         {
-            Console.WriteLine("Line is free or end of conversaition on {1}: {0}",
-                !e.Accepted, TelephoneNumber.ToString());
-
+            if (e.Accepted)
+            {
+                Console.WriteLine(" {0}, connection was established with # {1} #. Wait for taker..", e.Caller.Name, e.Taker.Name);
+            }
+            else
+            {
+                if (e.Taker == null)
+                    Console.WriteLine("{0}, Taker abort call", e.Caller.Name);
+                else
+                    Console.WriteLine("{0}, line to {1} is busy or other reason.",
+                        e.Caller.Telephone.TelephoneNumber.CompareTo(TelephoneNumber) == 0 ? e.Caller.Name : e.Taker.Name,
+                        e.Caller.Telephone.TelephoneNumber.CompareTo(TelephoneNumber) == 0 ? e.Taker.Name : e.Caller.Name
+                        );
+            }
         }
 
 
