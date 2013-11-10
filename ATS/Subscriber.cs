@@ -62,6 +62,7 @@ namespace ATS
             }
         }
 
+        #region ICanCall
         public void Abort()
         {
             Telephone.Abort();
@@ -74,7 +75,7 @@ namespace ATS
 
         public void RecieveCall(Subscriber caller)
         {
-            telephone.RecieveCall(this, caller);
+            telephone.AcceptCall(this, caller);
         }
 
         private void ListenCall(object sender, BellEventArgs e)
@@ -87,7 +88,7 @@ namespace ATS
             else
                 Abort();
         }
-
+        #endregion
 
 
         public List<Session> GetSessions()

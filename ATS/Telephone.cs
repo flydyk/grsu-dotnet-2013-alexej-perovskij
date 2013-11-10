@@ -14,6 +14,8 @@ namespace ATS
         TelephoneNumber lastCaller = TelephoneNumber.Empty;
         Port port;
 
+        public event EventHandler<BellEventArgs> Bell;
+
         public Telephone(TelephoneNumber number)
         {
             ID = number.PortID + number.StandID * 100;
@@ -91,7 +93,7 @@ namespace ATS
         }
         #endregion
 
-
+        #region ICallingDevice
         public void Call(TelephoneNumber number)
         {
             if(Connected)
@@ -110,6 +112,11 @@ namespace ATS
             }
         }
 
+        public void AcceptCall(Subscriber taker, Subscriber caller)
+        {
+            port.GenAcceptCallBack(taker, caller);
+        }
+        #endregion
 
         private void RecieveCall(object sender, BellEventArgs e)
         {
@@ -117,7 +124,7 @@ namespace ATS
             Bell(this, e);
         }
 
-        public event EventHandler<BellEventArgs> Bell;
+        
 
         void port_CallBack(object sender, CallBackEventArgs e)
         {
@@ -128,7 +135,7 @@ namespace ATS
             else
             {
                 if (e.Taker == null)
-                    Console.WriteLine("{0}, Taker abort call", e.Caller.Name);
+                    Console.WriteLine("Taker abort call of {0}", e.Caller.Name);
                 else
                     Console.WriteLine("{0}, line to {1} is busy or other reason.",
                         e.Caller.Telephone.TelephoneNumber.CompareTo(TelephoneNumber) == 0 ? e.Caller.Name : e.Taker.Name,
@@ -138,15 +145,8 @@ namespace ATS
         }
 
 
-        public void RecieveCall(Subscriber taker,Subscriber caller)
-        {
-            port.GenAcceptCallBack(taker,caller);
-        }
+        
 
         
-        public void RecieveCall(Subscriber caller)
-        {
-            throw new NotImplementedException();
-        }
     }
 }
