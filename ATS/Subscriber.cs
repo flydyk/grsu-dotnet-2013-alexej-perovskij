@@ -73,9 +73,9 @@ namespace ATS
             Telephone.Call(number);
         }
 
-        public void RecieveCall(TelephoneNumber caller)
+        public void RecieveCall()
         {
-            telephone.AcceptCall(Telephone.TelephoneNumber, caller);
+            telephone.AcceptCall();
         }
 
         private void ListenCall(object sender, BellEventArgs e)
@@ -84,7 +84,7 @@ namespace ATS
                  e.Caller, Name);
             string todo = Console.ReadLine();
             if (todo == "y")
-                RecieveCall(e.Caller);
+                RecieveCall();
             else
                 Abort();
         }

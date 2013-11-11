@@ -16,22 +16,28 @@ namespace ATS
             Random rand_time = new Random();
             List<Subscriber> subscribers = GenerateSubscribers(ats);
 
-            
-            //1
+            /*
+            // 1
             subscribers[0].Call(subscribers[1].Telephone.TelephoneNumber);
             Sleep(rand_time);
             subscribers[0].Abort();
-            //2
+            // 2
             subscribers[2].Call(subscribers[0].Telephone.TelephoneNumber);
             Sleep(rand_time);
             subscribers[2].Abort();
-            //3
+            // 3
             subscribers[2].Call(subscribers[1].Telephone.TelephoneNumber);
             Sleep(rand_time);
             subscribers[1].Abort();
             subscribers[2].Abort();
+            // 4
+            subscribers[2].Call(subscribers[1].Telephone.TelephoneNumber);
+            Sleep(rand_time);
+            subscribers[1].Abort();
+            subscribers[2].Abort();
+            */
             //TestConversation(subscribers);
-            //RandomConversations(subscribers, 20);
+            RandomConversations(subscribers, 20);
             
             ShowStatForEach(subscribers);
 
@@ -63,10 +69,18 @@ namespace ATS
             ats.SignContract(s6, Tarrifs.Middle);
             ats.SignContract(s7, Tarrifs.Middle);
             ats.SignContract(s8, Tarrifs.Cheap);
-
+            
+            // Ports connect to telephones
+            ats[s1.Contract.StandID][s1.Contract.PortID].ConnectTo(s1.Telephone);
+            ats[s2.Contract.StandID][s2.Contract.PortID].ConnectTo(s2.Telephone);
+            ats[s3.Contract.StandID][s3.Contract.PortID].ConnectTo(s3.Telephone);
+                        
+            /*
+            // Telephones connect to ports
             s1.Telephone.ConnectTo(ats[s1.Contract.StandID][s1.Contract.PortID]);
             s2.Telephone.ConnectTo(ats[s2.Contract.StandID][s2.Contract.PortID]);
             s3.Telephone.ConnectTo(ats[s3.Contract.StandID][s3.Contract.PortID]);
+            */
             s4.Telephone.ConnectTo(ats[s4.Contract.StandID][s4.Contract.PortID]);
             s5.Telephone.ConnectTo(ats[s5.Contract.StandID][s5.Contract.PortID]);
             s6.Telephone.ConnectTo(ats[s6.Contract.StandID][s6.Contract.PortID]);
@@ -102,16 +116,17 @@ namespace ATS
             {
                 int sub1 = r.Next(subscribers.Count);
                 int sub2 = r.Next(subscribers.Count);
-                subscribers[sub1].Call(subscribers[sub2].Telephone.TelephoneNumber);
+                if (sub1 != sub2) subscribers[sub1].Call(subscribers[sub2].Telephone.TelephoneNumber);
+                else { i--; continue; }
                 Sleep(r);
-                if (sub1 == sub2) subscribers[sub1].Abort();
-                else
-                {
+                //if (sub1 == sub2) subscribers[sub1].Abort();
+                //else
+                //{
                     if (r.Next(2) == 0)
                         subscribers[sub1].Abort();
                     else 
                     subscribers[sub2].Abort();
-                }
+                //}
             }
         }
     }

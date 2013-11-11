@@ -6,11 +6,14 @@ using System.Threading.Tasks;
 
 namespace ATS
 {
-    public enum AbortReason
+    public enum LineSingnal
     {
-        ATS,
+        None,
+        ATSAbort,
         BusyLine,
-        Subsriber
+        SubsriberAbort,
+        Established,
+        Accept
     }
 
     public class ATS
@@ -19,6 +22,9 @@ namespace ATS
         Dictionary<int, ATSStand> stands;
         Dictionary<TelephoneNumber, Contract> contracts;
         Dictionary<TelephoneNumber, List<Session>> statistics;
+        Dictionary<int, Session> currentSessions;
+        int sessionID;
+
         TelephoneNumber newTelephoneNumber = TelephoneNumber.Empty;
         public string Owner { get; set; }
 
@@ -28,6 +34,7 @@ namespace ATS
             ID = id;
             contracts = new Dictionary<TelephoneNumber, Contract>();
             statistics = new Dictionary<TelephoneNumber, List<Session>>();
+            currentSessions = new Dictionary<int, Session>();
 
             stands = new Dictionary<int, ATSStand>();
         }
@@ -53,7 +60,7 @@ namespace ATS
 
         public Contract SignContract(Subscriber sub, Tarrifs tarrif)
         {
-            TelephoneNumber number = GetTelephoneNumber();
+            TelephoneNumber number = NewTelephoneNumber();
             Contract contract = new Contract()
             {
                 Subscriber = sub,
@@ -65,58 +72,43 @@ namespace ATS
                 ATS = this
             };
             sub.Contract = contract;
-            sub.Telephone = contract.Telephone;
-
+            sub.Telephone = contract.Telephone;            
             // configure ports
             this[contract.StandID][contract.PortID].IncommingCall += ATS_IncommingCall;
             this[contract.StandID][contract.PortID].AbortCall += ATS_AbortCall;
             this[contract.StandID][contract.PortID].AcceptCallBack += ATS_AcceptCallBack;
-            
+
+            statistics.Add(number, new List<Session>());
             contracts.Add(number, contract);
             return contract;
         }
 
         void ATS_AcceptCallBack(object sender, CallEventArgs e)
         {
-            Session s = new Session(1)
-                {
-                    Caller = contracts[e.Caller].Subscriber,
-                    Taker = contracts[e.Taker].Subscriber,
-                    StartTime = DateTime.Now,
-                };
-
-            if (!statistics.ContainsKey(e.Caller))
-            {
-                List<Session> ses = new List<Session>();
-                statistics.Add(e.Caller, ses);
-            }
-            statistics[e.Caller].Add(s);
+            currentSessions[e.SessionID].StartTime = DateTime.Now;
         }
 
         void ATS_AbortCall(object sender, AbortCallEventArgs e)
         {
             switch (e.Reason)
             {
-                case AbortReason.ATS:
+                case LineSingnal.ATSAbort:
                     break;
-                case AbortReason.Subsriber:
-                    if (statistics.ContainsKey(e.Caller))
-                    {
-                        Session s = statistics[e.Caller][statistics[e.Caller].Count - 1];
-                        s.EndTime = DateTime.Now;
-                        int port = s.Taker.Contract.PortID;
-                        int stand = s.Taker.Contract.StandID;
-                        CallEventArgs cb = new CallEventArgs(false, e.Caller, s.Taker.Telephone.TelephoneNumber);
-                        this[stand][port].GenCallBack(cb);
-                        port = e.Caller.PortID;
-                        stand = e.Caller.StandID;
-                        this[stand][port].GenCallBack(cb);
-                    }
-                    else 
-                    {
-                        this[e.Caller.StandID][e.Caller.PortID]
-                            .GenCallBack(new CallEventArgs(false, e.Caller, TelephoneNumber.Empty));
-                    }
+                case LineSingnal.SubsriberAbort:
+                    Session s = currentSessions[e.SessionID];
+                    s.EndTime = DateTime.Now;
+
+                    TelephoneNumber caller = s.Caller.Telephone.TelephoneNumber;
+                    TelephoneNumber taker = s.Taker.Telephone.TelephoneNumber;
+
+                    TelephoneNumber target = (e.Aborter == caller) ? taker : caller;
+
+                    statistics[caller].Add(s);
+                    currentSessions.Remove(e.SessionID);
+                    CallEventArgs cb = new CallEventArgs(-1, e.Reason, caller, e.Aborter);
+
+                    this[target.StandID][target.PortID].GenCallBack(cb);
+
                     break;
                 default:
                     break;
@@ -129,16 +121,34 @@ namespace ATS
             Port fromPort = (Port)sender;
             if (toPort.IsBusy || !toPort.Connected)
             {
-                fromPort.GenCallBack(new CallEventArgs(false, e.Caller, e.Taker));
+                fromPort.GenCallBack(new CallEventArgs(-1, LineSingnal.BusyLine, e.Caller, e.Taker));
             }
             else
             {
-                fromPort.GenCallBack(new CallEventArgs(true, e.Caller, e.Taker));
-                toPort.GenCall(e.Caller);
+                CallEventArgs cea = new CallEventArgs(NewSession(e), LineSingnal.Established, e.Caller, e.Taker);
+                fromPort.GenCallBack(cea);
+                toPort.GenCall(cea);
             };
         }
 
-        TelephoneNumber GetTelephoneNumber()
+        int NewSessionID()
+        {
+            return sessionID++;
+        }
+
+        int NewSession(CallEventArgs e)
+        {
+            Session s = new Session(NewSessionID())
+            {
+                Caller = contracts[e.Caller].Subscriber,
+                Taker = contracts[e.Taker].Subscriber,
+            };
+            currentSessions.Add(s.ID, s);
+
+            return s.ID;
+        }
+
+        TelephoneNumber NewTelephoneNumber()
         {
             newTelephoneNumber.PortID = (newTelephoneNumber.PortID + 1) % ATSStand.PORTS_COUNT;
             if (newTelephoneNumber.PortID == 0)
@@ -151,6 +161,7 @@ namespace ATS
             return newTelephoneNumber;
         }
 
+        #region Selectors of sessions
         public List<Session> GetSessions(TelephoneNumber number)
         {
             if (statistics.ContainsKey(number))
@@ -181,6 +192,8 @@ namespace ATS
                            select session;
             return sessions.ToList();
         }
+        #endregion
+
         /// <summary>
         /// Get ATSStand by ID 
         /// </summary>
@@ -208,19 +221,25 @@ namespace ATS
 
     public class CallEventArgs : EventArgs
     {
-        public readonly bool Accepted;
+        public readonly LineSingnal Signal;
         public readonly TelephoneNumber Caller;
         public readonly TelephoneNumber Taker;
+        public readonly int SessionID;
 
-        public CallEventArgs(bool accepted, TelephoneNumber caller, TelephoneNumber taker)
+        public CallEventArgs(int sessionID,LineSingnal signal, TelephoneNumber caller, TelephoneNumber taker)
         {
             Caller = caller;
             Taker = taker;
-            Accepted = accepted;
+            Signal = signal;
+            SessionID = sessionID;
         }
 
         public CallEventArgs(TelephoneNumber caller, TelephoneNumber taker)
-            : this(true, caller, taker)
+            : this(-1, LineSingnal.None, caller, taker)
+        {
+        }
+        public CallEventArgs(int sessionID, LineSingnal signal)
+            : this(sessionID, LineSingnal.None, TelephoneNumber.Empty, TelephoneNumber.Empty)
         {
         }
 
@@ -228,22 +247,26 @@ namespace ATS
 
     public class AbortCallEventArgs : EventArgs
     {
-        public readonly AbortReason Reason;
-        public readonly TelephoneNumber Caller;
+        public readonly LineSingnal Reason;
+        public readonly int SessionID;
+        public readonly TelephoneNumber Aborter;
 
-        public AbortCallEventArgs(AbortReason reason,TelephoneNumber caller)
+        public AbortCallEventArgs(int sessionID, LineSingnal reason, TelephoneNumber aborter)
         {
-            Caller = caller;
+            SessionID = sessionID;
             Reason = reason;
+            Aborter = aborter;
         }
     }
 
     public class BellEventArgs : EventArgs
     {
         public readonly TelephoneNumber Caller;
+        public readonly int SessionID;
 
-        public BellEventArgs(TelephoneNumber caller)
+        public BellEventArgs(int sessionID, TelephoneNumber caller)
         {
+            SessionID = sessionID;
             Caller = caller;
         }
     }

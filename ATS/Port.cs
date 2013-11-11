@@ -22,30 +22,31 @@ namespace ATS
             ID = id;
         }
 
-        public void RecieveCall(TelephoneNumber thisNumber, TelephoneNumber thatNumber)
+        public void RecieveCall(TelephoneNumber caller, TelephoneNumber taker)
         {
             if (IncommingCall != null)
             {
                 IsBusy = true;
-                IncommingCall(this, new CallEventArgs(thisNumber, thatNumber));
+                IncommingCall(this, new CallEventArgs(caller, taker));
             }
         }
-        public void GenCall(TelephoneNumber sub)
+        public void GenCall(CallEventArgs sub)
         {
             Telephone t = dev as Telephone;
             if (t != null && GenerateCall != null)
             {
                 IsBusy = true;
-                GenerateCall(this, new BellEventArgs(sub));
+                GenerateCall(this, new BellEventArgs(sub.SessionID, sub.Caller));
             }
         }
 
-        public void Abort(AbortReason reason,TelephoneNumber caller)
+        public void Abort(int sessionID, LineSingnal reason, TelephoneNumber aborter)
         {
             if (AbortCall != null)
             {
                 IsBusy = false;
-                AbortCall(this, new AbortCallEventArgs(reason,caller));
+                if (sessionID != -1)
+                    AbortCall(this, new AbortCallEventArgs(sessionID, reason, aborter));
             }
         }
 
@@ -53,16 +54,16 @@ namespace ATS
         {
             if (CallBack != null)
             {
-                IsBusy = e.Accepted;
+                
                 CallBack(this, e);
             }
         }
 
-        public void GenAcceptCallBack(TelephoneNumber taker, TelephoneNumber caller)
+        public void GenAcceptCallBack(int sessionID)
         {
             if (AcceptCallBack != null)
             {
-                CallEventArgs e = new CallEventArgs(true, caller, taker);
+                CallEventArgs e = new CallEventArgs(sessionID, LineSingnal.Accept);
                 AcceptCallBack(this, e);
             }
         }

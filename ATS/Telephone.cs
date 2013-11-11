@@ -14,6 +14,7 @@ namespace ATS
         TelephoneNumber lastCaller = TelephoneNumber.Empty;
         TelephoneNumber currentCaller = TelephoneNumber.Empty;
         Port port;
+        int sessionID;
 
         public event EventHandler<CallEventArgs> Calling;
 
@@ -56,8 +57,8 @@ namespace ATS
             port = dev;
             if (port.ConnectedDevice == this)
             {
-                //port.GenerateCall += RecieveCall;
-                //port.CallBack += port_CallBack; 
+                port.GenerateCall += RecieveCall;
+                port.CallBack += port_CallBack; 
                 return true;
             }
 
@@ -120,20 +121,22 @@ namespace ATS
             {
                 // 2
                 lastCaller = currentCaller;
-                port.Abort(AbortReason.Subsriber, lastCaller == TelephoneNumber ? lastCaller : TelephoneNumber.Empty);
+                port.Abort(sessionID, LineSingnal.SubsriberAbort, TelephoneNumber);
+                sessionID = -1;
                 
             }
         }
 
-        public void AcceptCall(TelephoneNumber taker, TelephoneNumber caller)
+        public void AcceptCall()
         {
             // 3
-            port.GenAcceptCallBack(taker, caller);
+            port.GenAcceptCallBack(sessionID);
         }
         #endregion
 
         private void RecieveCall(object sender, BellEventArgs e)
         {
+            sessionID = e.SessionID;
             currentCaller = e.Caller;
             Bell(this, e);
         }
@@ -142,19 +145,26 @@ namespace ATS
 
         void port_CallBack(object sender, CallEventArgs e)
         {
-            if (e.Accepted)
+            sessionID = e.SessionID;
+            switch (e.Signal)
             {
-                Console.WriteLine(" {0}, connection was established with # {1} #. Wait for taker..", e.Caller, e.Taker);
-            }
-            else
-            {
-                if (e.Taker == TelephoneNumber.Empty)
-                    Console.WriteLine("Taker abort call of {0}", e.Caller);
-                else
-                    Console.WriteLine("{0}, line to {1} is busy or other reason.",
-                        e.Caller == TelephoneNumber ? e.Caller : e.Taker,
-                        e.Caller == TelephoneNumber ? e.Taker : e.Caller
-                        );
+                case LineSingnal.None:
+                    break;
+                case LineSingnal.ATSAbort:
+                    break;
+                case LineSingnal.BusyLine:
+                    Console.WriteLine("{0}, Line is busy to {1} or other reason", e.Caller, e.Taker);
+                    break;
+                case LineSingnal.SubsriberAbort:
+                    Console.WriteLine("{0} abort call of {0}", e.Taker, e.Caller);
+                    break;
+                case LineSingnal.Established:
+                    Console.WriteLine(" {0}, connection was established with # {1} #. Wait for taker..", e.Caller, e.Taker);
+                    break;
+                case LineSingnal.Accept:
+                    break;
+                default:
+                    break;
             }
         }
 
