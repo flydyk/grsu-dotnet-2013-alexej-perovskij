@@ -76,21 +76,21 @@ namespace ATS
             return contract;
         }
 
-        void ATS_AcceptCallBack(object sender, CallBackEventArgs e)
+        void ATS_AcceptCallBack(object sender, CallEventArgs e)
         {
             Session s = new Session(1)
                 {
-                    Caller = e.Caller,
-                    Taker = e.Taker,
+                    Caller = contracts[e.Caller].Subscriber,
+                    Taker = contracts[e.Taker].Subscriber,
                     StartTime = DateTime.Now,
                 };
 
-            if (!statistics.ContainsKey(s.Caller.Telephone.TelephoneNumber))
+            if (!statistics.ContainsKey(e.Caller))
             {
                 List<Session> ses = new List<Session>();
-                statistics.Add(s.Caller.Telephone.TelephoneNumber, ses);
+                statistics.Add(e.Caller, ses);
             }
-            statistics[s.Caller.Telephone.TelephoneNumber].Add(s);
+            statistics[e.Caller].Add(s);
         }
 
         void ATS_AbortCall(object sender, AbortCallEventArgs e)
@@ -106,16 +106,16 @@ namespace ATS
                         s.EndTime = DateTime.Now;
                         int port = s.Taker.Contract.PortID;
                         int stand = s.Taker.Contract.StandID;
-                        CallBackEventArgs cb = new CallBackEventArgs(false, s.Caller, s.Taker);
+                        CallEventArgs cb = new CallEventArgs(false, e.Caller, s.Taker.Telephone.TelephoneNumber);
                         this[stand][port].GenCallBack(cb);
-                        port = s.Caller.Contract.PortID;
-                        stand = s.Caller.Contract.StandID;
+                        port = e.Caller.PortID;
+                        stand = e.Caller.StandID;
                         this[stand][port].GenCallBack(cb);
                     }
                     else 
                     {
                         this[e.Caller.StandID][e.Caller.PortID]
-                            .GenCallBack(new CallBackEventArgs(false, contracts[e.Caller].Subscriber, null));
+                            .GenCallBack(new CallEventArgs(false, e.Caller, TelephoneNumber.Empty));
                     }
                     break;
                 default:
@@ -125,23 +125,16 @@ namespace ATS
 
         void ATS_IncommingCall(object sender, CallEventArgs e)
         {
-            Port toPort = this[e.ToNumber.StandID][e.ToNumber.PortID];
+            Port toPort = this[e.Taker.StandID][e.Taker.PortID];
             Port fromPort = (Port)sender;
-            Subscriber caller = contracts[e.FromNumber].Subscriber;
-            Subscriber taker=contracts[e.ToNumber].Subscriber;
-            if (toPort.IsBusy||!toPort.Connected)
+            if (toPort.IsBusy || !toPort.Connected)
             {
-                fromPort.GenCallBack(new CallBackEventArgs(false, caller, taker));
+                fromPort.GenCallBack(new CallEventArgs(false, e.Caller, e.Taker));
             }
             else
             {
-                fromPort.GenCallBack(
-                    new CallBackEventArgs(
-                        true,
-                        caller,
-                        taker)
-                    );
-                toPort.GenCall(caller);
+                fromPort.GenCallBack(new CallEventArgs(true, e.Caller, e.Taker));
+                toPort.GenCall(e.Caller);
             };
         }
 
@@ -213,29 +206,24 @@ namespace ATS
 
 
 
-    public class CallEventArgs:EventArgs
-    {
-        public readonly TelephoneNumber FromNumber;
-        public readonly TelephoneNumber ToNumber;
-
-        public CallEventArgs(TelephoneNumber thisNumber, TelephoneNumber thatNumber)
-        {
-            FromNumber = thisNumber;
-            ToNumber = thatNumber;
-        }
-    }
-
-    public class CallBackEventArgs : EventArgs
+    public class CallEventArgs : EventArgs
     {
         public readonly bool Accepted;
-        public readonly Subscriber Caller;
-        public readonly Subscriber Taker;
-        public CallBackEventArgs(bool accepted,Subscriber caller,Subscriber taker)
+        public readonly TelephoneNumber Caller;
+        public readonly TelephoneNumber Taker;
+
+        public CallEventArgs(bool accepted, TelephoneNumber caller, TelephoneNumber taker)
         {
             Caller = caller;
             Taker = taker;
             Accepted = accepted;
         }
+
+        public CallEventArgs(TelephoneNumber caller, TelephoneNumber taker)
+            : this(true, caller, taker)
+        {
+        }
+
     }
 
     public class AbortCallEventArgs : EventArgs
@@ -252,22 +240,11 @@ namespace ATS
 
     public class BellEventArgs : EventArgs
     {
-        public readonly Subscriber CallingSubscriber;
+        public readonly TelephoneNumber Caller;
 
-        public BellEventArgs(Subscriber s)
+        public BellEventArgs(TelephoneNumber caller)
         {
-            CallingSubscriber = s;
+            Caller = caller;
         }
     }
-    /*
-    public class RecieveCallBackEventArgs : EventArgs
-    {
-        public readonly bool Accepted;
-        public readonly Session Session;
-        public RecieveCallBackEventArgs(bool accepted,Session session)
-        {
-            Session = session;
-            Accepted = accepted;
-        }
-    }*/
 }

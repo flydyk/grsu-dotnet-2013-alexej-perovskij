@@ -16,11 +16,11 @@ namespace ATS
             Random rand_time = new Random();
             List<Subscriber> subscribers = GenerateSubscribers(ats);
 
-            /*
+            
             //1
             subscribers[0].Call(subscribers[1].Telephone.TelephoneNumber);
             Sleep(rand_time);
-            subscribers[1].Abort();
+            subscribers[0].Abort();
             //2
             subscribers[2].Call(subscribers[0].Telephone.TelephoneNumber);
             Sleep(rand_time);
@@ -29,12 +29,18 @@ namespace ATS
             subscribers[2].Call(subscribers[1].Telephone.TelephoneNumber);
             Sleep(rand_time);
             subscribers[1].Abort();
-            */
-            RandomConversations(subscribers, 20);
-
+            subscribers[2].Abort();
+            //TestConversation(subscribers);
+            //RandomConversations(subscribers, 20);
+            
             ShowStatForEach(subscribers);
 
             Console.ReadLine();
+        }
+
+        private static void TestConversation(List<Subscriber> subscribers)
+        {
+            throw new NotImplementedException();
         }
 
         static List<Subscriber> GenerateSubscribers(ATS ats)
@@ -98,10 +104,14 @@ namespace ATS
                 int sub2 = r.Next(subscribers.Count);
                 subscribers[sub1].Call(subscribers[sub2].Telephone.TelephoneNumber);
                 Sleep(r);
-                if (r.Next(2) == 0)
-                    subscribers[sub1].Abort();
-                else 
-                    subscribers[sub1].Abort();
+                if (sub1 == sub2) subscribers[sub1].Abort();
+                else
+                {
+                    if (r.Next(2) == 0)
+                        subscribers[sub1].Abort();
+                    else 
+                    subscribers[sub2].Abort();
+                }
             }
         }
     }

@@ -10,7 +10,7 @@ namespace ATS
     {
         void Call(TelephoneNumber number);
         void Abort();
-        void AcceptCall(Subscriber taker, Subscriber caller);
+        void AcceptCall(TelephoneNumber taker, TelephoneNumber caller);
         event EventHandler<BellEventArgs> Bell;
     }
 }

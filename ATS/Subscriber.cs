@@ -73,18 +73,18 @@ namespace ATS
             Telephone.Call(number);
         }
 
-        public void RecieveCall(Subscriber caller)
+        public void RecieveCall(TelephoneNumber caller)
         {
-            telephone.AcceptCall(this, caller);
+            telephone.AcceptCall(Telephone.TelephoneNumber, caller);
         }
 
         private void ListenCall(object sender, BellEventArgs e)
         {
-            Console.Write("{0} is calling to {1}\nRecieve call? (y/n)",
-                e.CallingSubscriber.Name, Name);
+            Console.Write("{0} is calling to you [ {1} ]\nRecieve call? (y/n)",
+                 e.Caller, Name);
             string todo = Console.ReadLine();
             if (todo == "y")
-                RecieveCall(e.CallingSubscriber);
+                RecieveCall(e.Caller);
             else
                 Abort();
         }

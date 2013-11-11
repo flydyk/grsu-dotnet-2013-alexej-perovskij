@@ -12,10 +12,10 @@ namespace ATS
         public bool IsBusy { get; set; }
         IConnectable dev = null;
         public event EventHandler<CallEventArgs> IncommingCall;
-        public event EventHandler<CallBackEventArgs> CallBack;
+        public event EventHandler<CallEventArgs> CallBack;
         public event EventHandler<AbortCallEventArgs> AbortCall;
         public event EventHandler<BellEventArgs> GenerateCall;
-        public event EventHandler<CallBackEventArgs> AcceptCallBack;
+        public event EventHandler<CallEventArgs> AcceptCallBack;
 
         public Port(int id)
         {
@@ -30,7 +30,7 @@ namespace ATS
                 IncommingCall(this, new CallEventArgs(thisNumber, thatNumber));
             }
         }
-        public void GenCall(Subscriber sub)
+        public void GenCall(TelephoneNumber sub)
         {
             Telephone t = dev as Telephone;
             if (t != null && GenerateCall != null)
@@ -49,7 +49,7 @@ namespace ATS
             }
         }
 
-        public void GenCallBack(CallBackEventArgs e)
+        public void GenCallBack(CallEventArgs e)
         {
             if (CallBack != null)
             {
@@ -58,11 +58,11 @@ namespace ATS
             }
         }
 
-        public void GenAcceptCallBack(Subscriber taker, Subscriber caller)
+        public void GenAcceptCallBack(TelephoneNumber taker, TelephoneNumber caller)
         {
             if (AcceptCallBack != null)
             {
-                CallBackEventArgs e = new CallBackEventArgs(true, caller, taker);
+                CallEventArgs e = new CallEventArgs(true, caller, taker);
                 AcceptCallBack(this, e);
             }
         }
@@ -83,14 +83,21 @@ namespace ATS
         {
             if (Connected) return false;
 
+
+
             dev = device;
-            if (dev.ConnectedDevice == this) return true;
+            if (dev.ConnectedDevice == this)
+            { 
+
+                return true; }
 
             if (!device.ConnectTo(this))
             {
                 dev = null;
                 return false;
             }
+
+
             return true;
         }
 

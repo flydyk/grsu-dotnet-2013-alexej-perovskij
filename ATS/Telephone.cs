@@ -12,7 +12,11 @@ namespace ATS
         int id;
         TelephoneNumber telephoneNumber;
         TelephoneNumber lastCaller = TelephoneNumber.Empty;
+        TelephoneNumber currentCaller = TelephoneNumber.Empty;
         Port port;
+
+        public event EventHandler<CallEventArgs> Calling;
+
 
         public event EventHandler<BellEventArgs> Bell;
 
@@ -50,7 +54,12 @@ namespace ATS
             if (dev == null) return false;
 
             port = dev;
-            if (port.ConnectedDevice == this) return true;
+            if (port.ConnectedDevice == this)
+            {
+                //port.GenerateCall += RecieveCall;
+                //port.CallBack += port_CallBack; 
+                return true;
+            }
 
             if (!dev.ConnectTo(this))
             {
@@ -98,8 +107,10 @@ namespace ATS
         {
             if(Connected)
             {
-                lastCaller = TelephoneNumber;
-                port.RecieveCall(TelephoneNumber,number);
+                currentCaller = TelephoneNumber;
+                // 1
+                port.RecieveCall(TelephoneNumber, number);
+                //Calling(this, new CallEventArgs(TelephoneNumber, number));
             }
         }
 
@@ -107,39 +118,42 @@ namespace ATS
         {
             if(Connected)
             {
-                port.Abort(AbortReason.Subsriber, lastCaller);
-                //lastCaller = TelephoneNumber.Empty;
+                // 2
+                lastCaller = currentCaller;
+                port.Abort(AbortReason.Subsriber, lastCaller == TelephoneNumber ? lastCaller : TelephoneNumber.Empty);
+                
             }
         }
 
-        public void AcceptCall(Subscriber taker, Subscriber caller)
+        public void AcceptCall(TelephoneNumber taker, TelephoneNumber caller)
         {
+            // 3
             port.GenAcceptCallBack(taker, caller);
         }
         #endregion
 
         private void RecieveCall(object sender, BellEventArgs e)
         {
-            lastCaller = e.CallingSubscriber.Telephone.TelephoneNumber;
+            currentCaller = e.Caller;
             Bell(this, e);
         }
 
-        
 
-        void port_CallBack(object sender, CallBackEventArgs e)
+
+        void port_CallBack(object sender, CallEventArgs e)
         {
             if (e.Accepted)
             {
-                Console.WriteLine(" {0}, connection was established with # {1} #. Wait for taker..", e.Caller.Name, e.Taker.Name);
+                Console.WriteLine(" {0}, connection was established with # {1} #. Wait for taker..", e.Caller, e.Taker);
             }
             else
             {
-                if (e.Taker == null)
-                    Console.WriteLine("Taker abort call of {0}", e.Caller.Name);
+                if (e.Taker == TelephoneNumber.Empty)
+                    Console.WriteLine("Taker abort call of {0}", e.Caller);
                 else
                     Console.WriteLine("{0}, line to {1} is busy or other reason.",
-                        e.Caller.Telephone.TelephoneNumber.CompareTo(TelephoneNumber) == 0 ? e.Caller.Name : e.Taker.Name,
-                        e.Caller.Telephone.TelephoneNumber.CompareTo(TelephoneNumber) == 0 ? e.Taker.Name : e.Caller.Name
+                        e.Caller == TelephoneNumber ? e.Caller : e.Taker,
+                        e.Caller == TelephoneNumber ? e.Taker : e.Caller
                         );
             }
         }

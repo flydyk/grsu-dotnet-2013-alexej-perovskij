@@ -47,5 +47,30 @@ namespace ATS
             }
             else return -1;
         }
+
+
+        public static bool operator ==(TelephoneNumber a, TelephoneNumber b)
+        {
+            if (System.Object.ReferenceEquals(a, b))
+            {
+                return true;
+            }
+
+            // If one is null, but not both, return false.
+            if (((object)a == null) || ((object)b == null))
+            {
+                return false;
+            }
+
+            // Return true if the fields match:
+            return a.PortID == b.PortID && a.StandID == b.StandID;
+        }
+
+        public static bool operator !=(TelephoneNumber a, TelephoneNumber b)
+        {
+            return !(a == b);
+        }
+
+
     }
 }
