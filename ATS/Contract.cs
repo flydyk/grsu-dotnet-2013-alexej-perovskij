@@ -13,7 +13,7 @@ namespace ATS
         public Telephone Telephone { get; set; }
         public Subscriber Subscriber { get; set; }
         public Tarrif Tarrif { get; set; }
-        public DateTime PayTime { get; set; }
+        public DateTime TarrifChanged { get; set; }
         public ATS ATS { get; set; }
     }
 }

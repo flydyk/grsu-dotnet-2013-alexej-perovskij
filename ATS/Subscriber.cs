@@ -13,6 +13,8 @@ namespace ATS
         public string Address { get; set; }
         public Contract Contract { get; set; }
 
+        public event EventHandler<BellEventArgs> ListenBell;
+
         private Telephone telephone;
 
         public Subscriber(int id, string name, string address)
@@ -75,11 +77,16 @@ namespace ATS
 
         public void RecieveCall()
         {
-            telephone.AcceptCall();
+            Telephone.AcceptCall();
         }
 
         private void ListenCall(object sender, BellEventArgs e)
         {
+            if (ListenBell != null)
+                ListenBell(this, e);
+            else throw new NullReferenceException("You aren't able to listen bell");
+
+            /*
             Console.Write("{0} is calling to you [ {1} ]\nRecieve call? (y/n)",
                  e.Caller, Name);
             string todo = Console.ReadLine();
@@ -87,26 +94,30 @@ namespace ATS
                 RecieveCall();
             else
                 Abort();
+             * */
         }
         #endregion
 
 
-        public List<Session> GetSessions()
+        public IEnumerable<Session> GetSessions()
         {
             return Contract.ATS.GetSessions(Telephone.TelephoneNumber);
         }
-        public List<Session> SessionsFilteredByName(string name)
+        public IEnumerable<Session> SessionsFilteredByName(string name)
         {
             return Contract.ATS.SessionsFilteredByName(Telephone.TelephoneNumber, name);
         }
-        public List<Session> SessionsFilteredByCost(int lowBound, int highBound)
+        public IEnumerable<Session> SessionsFilteredByCost(int lowBound, int highBound)
         {
             return Contract.ATS.SessionsFilteredByCost(Telephone.TelephoneNumber, lowBound, highBound);
         }
-        public List<Session> SessionsFilteredByDate(DateTime lowBound, DateTime highBound)
+        public IEnumerable<Session> SessionsFilteredByDate(DateTime lowBound, DateTime highBound)
         {
             return Contract.ATS.SessionsFilteredByDate(Telephone.TelephoneNumber, lowBound, highBound);
         }
-
+        public int GetTotalCost()
+        {
+            return Contract.ATS.GetTotalCost(Telephone.TelephoneNumber);
+        }
     }
 }

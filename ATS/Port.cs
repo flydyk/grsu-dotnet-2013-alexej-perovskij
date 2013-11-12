@@ -10,7 +10,7 @@ namespace ATS
     {
         int id;
         public bool IsBusy { get; set; }
-        IConnectable dev = null;
+        Telephone dev = null;
         public event EventHandler<CallEventArgs> IncommingCall;
         public event EventHandler<CallEventArgs> CallBack;
         public event EventHandler<AbortCallEventArgs> AbortCall;
@@ -22,21 +22,23 @@ namespace ATS
             ID = id;
         }
 
+        public void GenCall(CallEventArgs sub)
+        {
+            if (GenerateCall != null)
+            {
+                IsBusy = true;
+                GenerateCall(this, new BellEventArgs(sub.SessionID, sub.Caller));
+            }
+        }
+
+        #region Hiden Methods for telephone
+        /*
         public void RecieveCall(TelephoneNumber caller, TelephoneNumber taker)
         {
             if (IncommingCall != null)
             {
                 IsBusy = true;
                 IncommingCall(this, new CallEventArgs(caller, taker));
-            }
-        }
-        public void GenCall(CallEventArgs sub)
-        {
-            Telephone t = dev as Telephone;
-            if (t != null && GenerateCall != null)
-            {
-                IsBusy = true;
-                GenerateCall(this, new BellEventArgs(sub.SessionID, sub.Caller));
             }
         }
 
@@ -50,21 +52,22 @@ namespace ATS
             }
         }
 
-        public void GenCallBack(CallEventArgs e)
-        {
-            if (CallBack != null)
-            {
-                
-                CallBack(this, e);
-            }
-        }
-
         public void GenAcceptCallBack(int sessionID)
         {
             if (AcceptCallBack != null)
             {
                 CallEventArgs e = new CallEventArgs(sessionID, LineSingnal.Accept);
                 AcceptCallBack(this, e);
+            }
+        }
+        */
+        #endregion
+
+        public void GenCallBack(CallEventArgs e)
+        {
+            if (CallBack != null)
+            {                
+                CallBack(this, e);
             }
         }
 
@@ -84,20 +87,26 @@ namespace ATS
         {
             if (Connected) return false;
 
+            Telephone _dev = device as Telephone;
+            if (_dev == null) return false;
 
-
-            dev = device;
+            dev = _dev;
             if (dev.ConnectedDevice == this)
-            { 
-
-                return true; }
+            {
+                dev.Calling += dev_Calling;
+                dev.Acepting += dev_Acepting;
+                dev.Aborting += dev_Aborting;
+                return true; 
+            }
 
             if (!device.ConnectTo(this))
             {
                 dev = null;
                 return false;
             }
-
+            dev.Calling += dev_Calling;
+            dev.Acepting += dev_Acepting;
+            dev.Aborting += dev_Aborting;
 
             return true;
         }
@@ -106,9 +115,13 @@ namespace ATS
         {
             if (Connected)
             {
-                IConnectable temp = dev;
+                Telephone temp = dev;
                 dev = null;
                 temp.Disconnect();
+
+                temp.Calling -= dev_Calling;
+                temp.Acepting -= dev_Acepting;
+                temp.Aborting -= dev_Aborting;
                 temp = null;
                 return true;
             }
@@ -125,6 +138,33 @@ namespace ATS
             get { return dev; }
         }
         #endregion
+
+        void dev_Aborting(object sender, AbortCallEventArgs e)
+        {
+            if (AbortCall != null)
+            {
+                IsBusy = false;
+                if (e.SessionID != -1)
+                    AbortCall(this, e);
+            }
+        }
+
+        void dev_Acepting(object sender, CallEventArgs e)
+        {
+            if (AcceptCallBack != null)
+            {                
+                AcceptCallBack(this, e);
+            }
+        }
+
+        void dev_Calling(object sender, CallEventArgs e)
+        {
+            if (IncommingCall != null)
+            {
+                IsBusy = true;
+                IncommingCall(this, e);
+            }
+        }
 
     }
 

@@ -35,7 +35,6 @@ namespace ATS
             contracts = new Dictionary<TelephoneNumber, Contract>();
             statistics = new Dictionary<TelephoneNumber, List<Session>>();
             currentSessions = new Dictionary<int, Session>();
-
             stands = new Dictionary<int, ATSStand>();
         }
 
@@ -68,7 +67,7 @@ namespace ATS
                 Telephone = new Telephone(number),
                 PortID = number.PortID,
                 StandID = number.StandID,
-                PayTime = DateTime.Now,
+                TarrifChanged = DateTime.Now,
                 ATS = this
             };
             sub.Contract = contract;
@@ -162,37 +161,40 @@ namespace ATS
         }
 
         #region Selectors of sessions
-        public List<Session> GetSessions(TelephoneNumber number)
+        public IEnumerable<Session> GetSessions(TelephoneNumber number)
         {
             if (statistics.ContainsKey(number))
-                return new List<Session>(statistics[number]);
+                return statistics[number];
             else return new List<Session>();
         }
 
-        public List<Session> SessionsFilteredByName(TelephoneNumber number, string name)
+        public IEnumerable<Session> SessionsFilteredByName(TelephoneNumber number, string name)
         {
-            var sessions = from session in GetSessions(number)
-                           where session.Taker.Name == name
-                           select session;
-            return sessions.ToList();
+            return GetSessions(number).FilterByName(name);
         }
 
-        public List<Session> SessionsFilteredByCost(TelephoneNumber number, int lowBound, int highBound)
+        public IEnumerable<Session> SessionsFilteredByCost(TelephoneNumber number, int lowBound, int highBound)
         {
-            var sessions = from session in GetSessions(number)
-                           where session.Cost >= lowBound && session.Cost <= highBound
-                           select session;
-            return sessions.ToList();
+            return GetSessions(number).FilterByCost(lowBound, highBound);
         }
 
-        public List<Session> SessionsFilteredByDate(TelephoneNumber number, DateTime lowBound, DateTime highBound)
+        public IEnumerable<Session> SessionsFilteredByDate(TelephoneNumber number, DateTime lowBound, DateTime highBound)
         {
-            var sessions = from session in GetSessions(number)
-                           where session.EndTime >= lowBound && session.EndTime <= highBound
-                           select session;
-            return sessions.ToList();
+            return GetSessions(number).FilterByDate(lowBound, highBound);
         }
         #endregion
+
+        public int GetTotalCost(TelephoneNumber number)
+        {
+            return GetSessions(number).Sum(x => x.Cost);
+        }
+
+
+        public void Pay(TelephoneNumber number, int sum)
+        {
+            Contract c = contracts[number];
+            
+        }
 
         /// <summary>
         /// Get ATSStand by ID 
@@ -268,6 +270,34 @@ namespace ATS
         {
             SessionID = sessionID;
             Caller = caller;
+        }
+    }
+
+
+    public static class SessionFilters
+    {
+        public static IEnumerable<Session> FilterByName(this IEnumerable<Session> s, string name)
+        {
+            var sessions = from session in s
+                           where session.Taker.Name == name
+                           select session;
+            return sessions;
+        }
+
+        public static IEnumerable<Session> FilterByCost(this IEnumerable<Session> s, int lowBound, int highBound)
+        {
+            var sessions = from session in s
+                           where session.Cost >= lowBound && session.Cost <= highBound
+                           select session;
+            return sessions;
+        }
+
+        public static IEnumerable<Session> FilterByDate(this IEnumerable<Session> s, DateTime lowBound, DateTime highBound)
+        {
+            var sessions = from session in s
+                           where session.EndTime >= lowBound && session.EndTime <= highBound
+                           select session;
+            return sessions;
         }
     }
 }

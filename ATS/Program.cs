@@ -36,22 +36,17 @@ namespace ATS
             subscribers[1].Abort();
             subscribers[2].Abort();
             */
-            //TestConversation(subscribers);
-            RandomConversations(subscribers, 20);
+
+            RandomConversations(subscribers, 15);
             
             ShowStatForEach(subscribers);
 
             Console.ReadLine();
         }
 
-        private static void TestConversation(List<Subscriber> subscribers)
-        {
-            throw new NotImplementedException();
-        }
-
         static List<Subscriber> GenerateSubscribers(ATS ats)
         {
-            Subscriber s1 = new Subscriber(1, "Alexey", "Grodno");
+            Subscriber s1 = new Subscriber(0, "Alexey", "Grodno");
             Subscriber s2 = new Subscriber(2, "George", "New-York");
             Subscriber s3 = new Subscriber(3, "Paolo", "Brazilia");
             Subscriber s4 = new Subscriber(4, "Elizabet", "Britain");
@@ -69,25 +64,26 @@ namespace ATS
             ats.SignContract(s6, Tarrifs.Middle);
             ats.SignContract(s7, Tarrifs.Middle);
             ats.SignContract(s8, Tarrifs.Cheap);
-            
-            // Ports connect to telephones
-            ats[s1.Contract.StandID][s1.Contract.PortID].ConnectTo(s1.Telephone);
-            ats[s2.Contract.StandID][s2.Contract.PortID].ConnectTo(s2.Telephone);
-            ats[s3.Contract.StandID][s3.Contract.PortID].ConnectTo(s3.Telephone);
-                        
-            /*
-            // Telephones connect to ports
-            s1.Telephone.ConnectTo(ats[s1.Contract.StandID][s1.Contract.PortID]);
-            s2.Telephone.ConnectTo(ats[s2.Contract.StandID][s2.Contract.PortID]);
-            s3.Telephone.ConnectTo(ats[s3.Contract.StandID][s3.Contract.PortID]);
-            */
-            s4.Telephone.ConnectTo(ats[s4.Contract.StandID][s4.Contract.PortID]);
-            s5.Telephone.ConnectTo(ats[s5.Contract.StandID][s5.Contract.PortID]);
-            s6.Telephone.ConnectTo(ats[s6.Contract.StandID][s6.Contract.PortID]);
-            s7.Telephone.ConnectTo(ats[s7.Contract.StandID][s7.Contract.PortID]);
-            s8.Telephone.ConnectTo(ats[s8.Contract.StandID][s8.Contract.PortID]);
+
+            foreach (var sub in subs)
+            {
+                sub.Telephone.ConnectTo(ats[sub.Contract.StandID][sub.Contract.PortID]);
+                sub.ListenBell += sub_ListenBell;
+            }
 
             return subs;
+        }
+
+        static void sub_ListenBell(object sender, BellEventArgs e)
+        {
+            Subscriber s = sender as Subscriber;
+            Console.Write("{0} is calling to you [ {1} ]\nRecieve call? (y/n)",
+                    e.Caller, s.Name);
+            string todo = Console.ReadLine();
+            if (todo == "y")
+                s.RecieveCall();
+            else
+                s.Abort();
         }
 
         static void ShowStatForEach(List<Subscriber> subscribers)
@@ -96,38 +92,46 @@ namespace ATS
 
             foreach (var subscriber in subscribers)
             {
-                Console.WriteLine("###### Statistic of: {0}", subscriber.Name);
+                Console.WriteLine("###### Statistic of: {0}. Tariff: {1}", subscriber.Name, subscriber.Contract.Tarrif.TarrifType);
                 foreach (var session in subscriber.GetSessions())
                 {
                     Console.WriteLine(session.ToString());
                 }
+                Console.WriteLine("###### Statistic filtered by Cost [0,50]");
+                foreach (var session in subscriber.SessionsFilteredByCost(0,50))
+                {
+                    Console.WriteLine(session.ToString());
+                }
+                Console.WriteLine("###### Total Cost: {0}", subscriber.GetTotalCost());
+                Console.WriteLine();
             }
         }
 
         static void Sleep(Random rand_time)
         {
-            Thread.Sleep(rand_time.Next(40, 100));
+            Thread.Sleep(rand_time.Next(10, 80));
         }
 
-        static void RandomConversations(List<Subscriber> subscribers,int count)
+        static void RandomConversations(List<Subscriber> subscribers, int count)
         {
             Random r = new Random();
             for (int i = 0; i < count; i++)
             {
                 int sub1 = r.Next(subscribers.Count);
                 int sub2 = r.Next(subscribers.Count);
-                if (sub1 != sub2) subscribers[sub1].Call(subscribers[sub2].Telephone.TelephoneNumber);
-                else { i--; continue; }
+                subscribers[sub1].Call(subscribers[sub2].Telephone.TelephoneNumber);
                 Sleep(r);
-                //if (sub1 == sub2) subscribers[sub1].Abort();
-                //else
-                //{
+                if (sub1 == sub2) subscribers[sub1].Abort();
+                else
+                {
                     if (r.Next(2) == 0)
-                        subscribers[sub1].Abort();
-                    else 
                     subscribers[sub2].Abort();
-                //}
+                    else 
+                    subscribers[sub1].Abort();
+                }
             }
         }
+
+        
     }
 }

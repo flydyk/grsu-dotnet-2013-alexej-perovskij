@@ -11,13 +11,15 @@ namespace ATS
     {
         int id;
         TelephoneNumber telephoneNumber;
-        TelephoneNumber lastCaller = TelephoneNumber.Empty;
-        TelephoneNumber currentCaller = TelephoneNumber.Empty;
+        TelephoneNumber lastIncomingCall = TelephoneNumber.Empty;
+        TelephoneNumber currentIncomingCall = TelephoneNumber.Empty;
+        TelephoneNumber missedCall = TelephoneNumber.Empty;
         Port port;
         int sessionID;
 
         public event EventHandler<CallEventArgs> Calling;
-
+        public event EventHandler<AbortCallEventArgs> Aborting;
+        public event EventHandler<CallEventArgs> Acepting;
 
         public event EventHandler<BellEventArgs> Bell;
 
@@ -58,7 +60,7 @@ namespace ATS
             if (port.ConnectedDevice == this)
             {
                 port.GenerateCall += RecieveCall;
-                port.CallBack += port_CallBack; 
+                port.CallBack += port_CallBack;
                 return true;
             }
 
@@ -108,10 +110,7 @@ namespace ATS
         {
             if(Connected)
             {
-                currentCaller = TelephoneNumber;
-                // 1
-                port.RecieveCall(TelephoneNumber, number);
-                //Calling(this, new CallEventArgs(TelephoneNumber, number));
+                Calling(this, new CallEventArgs(TelephoneNumber, number));
             }
         }
 
@@ -119,28 +118,30 @@ namespace ATS
         {
             if(Connected)
             {
-                // 2
-                lastCaller = currentCaller;
-                port.Abort(sessionID, LineSingnal.SubsriberAbort, TelephoneNumber);
+                lastIncomingCall = currentIncomingCall;
+                Aborting(this, new AbortCallEventArgs(sessionID, LineSingnal.SubsriberAbort, TelephoneNumber));
                 sessionID = -1;
+                currentIncomingCall = TelephoneNumber.Empty;
                 
             }
         }
 
         public void AcceptCall()
         {
-            // 3
-            port.GenAcceptCallBack(sessionID);
+            if (Connected)
+            {
+                lastIncomingCall = currentIncomingCall;
+                Acepting(this, new CallEventArgs(sessionID, LineSingnal.Accept));
+            }
         }
         #endregion
 
-        private void RecieveCall(object sender, BellEventArgs e)
+        void RecieveCall(object sender, BellEventArgs e)
         {
             sessionID = e.SessionID;
-            currentCaller = e.Caller;
+            currentIncomingCall = e.Caller;
             Bell(this, e);
         }
-
 
 
         void port_CallBack(object sender, CallEventArgs e)
@@ -153,10 +154,10 @@ namespace ATS
                 case LineSingnal.ATSAbort:
                     break;
                 case LineSingnal.BusyLine:
-                    Console.WriteLine("{0}, Line is busy to {1} or other reason", e.Caller, e.Taker);
+                    Console.WriteLine("{0}, Line is busy to {1} or other reason", TelephoneNumber, e.Taker);
                     break;
                 case LineSingnal.SubsriberAbort:
-                    Console.WriteLine("{0} abort call of {0}", e.Taker, e.Caller);
+                    Console.WriteLine("Abort call");
                     break;
                 case LineSingnal.Established:
                     Console.WriteLine(" {0}, connection was established with # {1} #. Wait for taker..", e.Caller, e.Taker);
