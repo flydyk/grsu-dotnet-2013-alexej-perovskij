@@ -75,7 +75,7 @@ namespace ATS
             Telephone.Call(number);
         }
 
-        public void RecieveCall()
+        public void AcceptCall()
         {
             Telephone.AcceptCall();
         }

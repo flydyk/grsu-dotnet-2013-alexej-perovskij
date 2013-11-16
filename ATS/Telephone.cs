@@ -15,7 +15,7 @@ namespace ATS
         TelephoneNumber currentIncomingCall = TelephoneNumber.Empty;
         TelephoneNumber missedCall = TelephoneNumber.Empty;
         Port port;
-        int sessionID;
+        int sessionID = -1;
 
         public event EventHandler<CallEventArgs> Calling;
         public event EventHandler<AbortCallEventArgs> Aborting;
@@ -110,9 +110,28 @@ namespace ATS
         {
             if(Connected)
             {
+               // AsyncCall
+               // CallRequest(number);
+                
                 Calling(this, new CallEventArgs(TelephoneNumber, number));
             }
         }
+
+        #region AsyncCall
+        protected virtual void CallRequest(TelephoneNumber number)
+        {
+            IAsyncResult ar = Calling.BeginInvoke(this, new CallEventArgs(TelephoneNumber, number), PortCallBack, null);
+            
+        }
+
+        private void PortCallBack(IAsyncResult ar)
+        {
+            if (Calling != null)
+            {
+                Calling.EndInvoke(ar);
+            }
+        }
+        #endregion
 
         public void Abort()
         {

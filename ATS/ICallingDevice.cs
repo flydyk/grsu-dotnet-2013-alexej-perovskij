@@ -6,11 +6,8 @@ using System.Threading.Tasks;
 
 namespace ATS
 {
-    public interface ICallingDevice
+    public interface ICallingDevice:ICanCall
     {
-        void Call(TelephoneNumber number);
-        void Abort();
-        void AcceptCall();
         event EventHandler<BellEventArgs> Bell;
     }
 }

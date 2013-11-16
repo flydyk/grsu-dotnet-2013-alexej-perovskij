@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Timers;
 
 namespace ATS
 {
@@ -27,6 +28,8 @@ namespace ATS
 
         TelephoneNumber newTelephoneNumber = TelephoneNumber.Empty;
         public string Owner { get; set; }
+        private Timer t;
+        const int secondsInMonth = 3;
 
         public ATS(int id, string owner)
         {
@@ -36,6 +39,22 @@ namespace ATS
             statistics = new Dictionary<TelephoneNumber, List<Session>>();
             currentSessions = new Dictionary<int, Session>();
             stands = new Dictionary<int, ATSStand>();
+            t = new Timer(secondsInMonth * 1000);
+            t.AutoReset = true;
+            t.Enabled = true;
+            t.Elapsed += t_Elapsed;
+            t.Start(); 
+        }
+
+        void t_Elapsed(object sender, ElapsedEventArgs e)
+        {
+            if (contracts.Count > 0)
+            {
+                foreach (var c in contracts)
+                {
+                    c.Value.ToPay += c.Value.Tarrif.MonthCost + GetTotalCost(c.Key);
+                }
+            }
         }
 
         public void AddStand()
@@ -118,7 +137,7 @@ namespace ATS
         {
             Port toPort = this[e.Taker.StandID][e.Taker.PortID];
             Port fromPort = (Port)sender;
-            if (toPort.IsBusy || !toPort.Connected)
+            if (toPort.IsBusy || !toPort.Connected || contracts[e.Caller].ToPay > 0)
             {
                 fromPort.GenCallBack(new CallEventArgs(-1, LineSingnal.BusyLine, e.Caller, e.Taker));
             }
@@ -189,11 +208,26 @@ namespace ATS
             return GetSessions(number).Sum(x => x.Cost);
         }
 
+        public void ChangeTarrif(TelephoneNumber number, Tarrifs newTarrif)
+        {
+            if (!contracts.ContainsKey(number))
+                throw new KeyNotFoundException(string.Format("There is no subscriber with number {0}", number));
+
+            Contract c = contracts[number];
+            if ((c.TarrifChanged - DateTime.Now).Seconds > secondsInMonth)
+            {
+                c.Tarrif = new Tarrif(newTarrif);
+                c.TarrifChanged = DateTime.Now;
+            }
+        }
 
         public void Pay(TelephoneNumber number, int sum)
         {
-            Contract c = contracts[number];
+            if (!contracts.ContainsKey(number))
+                throw new KeyNotFoundException(string.Format("There is no subscriber with number {0}", number));
             
+            Contract c = contracts[number];
+            c.ToPay -= sum;
         }
 
         /// <summary>

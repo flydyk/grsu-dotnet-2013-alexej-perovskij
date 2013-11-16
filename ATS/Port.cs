@@ -162,9 +162,10 @@ namespace ATS
             if (IncommingCall != null)
             {
                 IsBusy = true;
-                IncommingCall(this, e);
+               IncommingCall(this, e);
             }
         }
+
 
     }
 

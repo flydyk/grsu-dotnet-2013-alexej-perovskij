@@ -15,5 +15,6 @@ namespace ATS
         public Tarrif Tarrif { get; set; }
         public DateTime TarrifChanged { get; set; }
         public ATS ATS { get; set; }
+        public int ToPay { get; set; }
     }
 }

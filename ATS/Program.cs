@@ -20,9 +20,9 @@ namespace ATS
             // 1
             subscribers[0].Call(subscribers[1].Telephone.TelephoneNumber);
             Sleep(rand_time);
-            subscribers[0].Abort();
+            //subscribers[1].Abort();
             // 2
-            subscribers[2].Call(subscribers[0].Telephone.TelephoneNumber);
+            subscribers[0].Call(subscribers[1].Telephone.TelephoneNumber);
             Sleep(rand_time);
             subscribers[2].Abort();
             // 3
@@ -36,8 +36,8 @@ namespace ATS
             subscribers[1].Abort();
             subscribers[2].Abort();
             */
-
-            RandomConversations(subscribers, 15);
+            
+            RandomConversations(ats,subscribers, 100);
             
             ShowStatForEach(subscribers);
 
@@ -79,31 +79,42 @@ namespace ATS
             Subscriber s = sender as Subscriber;
             Console.Write("{0} is calling to you [ {1} ]\nRecieve call? (y/n)",
                     e.Caller, s.Name);
-            string todo = Console.ReadLine();
-            if (todo == "y")
-                s.RecieveCall();
-            else
-                s.Abort();
+            //string todo = Console.ReadLine();
+            //if (todo == "y")
+                s.AcceptCall();
+            //else
+            //    s.Abort();
         }
 
         static void ShowStatForEach(List<Subscriber> subscribers)
         {
-            Console.WriteLine("==================================\n============ STATISTIC ============");
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("=====================================\n============= STATISTIC =============");
 
             foreach (var subscriber in subscribers)
             {
-                Console.WriteLine("###### Statistic of: {0}. Tariff: {1}", subscriber.Name, subscriber.Contract.Tarrif.TarrifType);
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("###### Statistic of: {0}. Tariff: {1}",
+                    subscriber.Name, subscriber.Contract.Tarrif.TarrifType);
+                Console.ForegroundColor = ConsoleColor.DarkGreen;
+                Console.WriteLine("Should pay: {0} $", subscriber.Contract.ToPay);
+
+                Console.ForegroundColor = ConsoleColor.DarkYellow;
                 foreach (var session in subscriber.GetSessions())
                 {
                     Console.WriteLine(session.ToString());
                 }
+                Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("###### Statistic filtered by Cost [0,50]");
-                foreach (var session in subscriber.SessionsFilteredByCost(0,50))
+                Console.ForegroundColor = ConsoleColor.DarkYellow;
+                foreach (var session in subscriber.SessionsFilteredByCost(0, 50))
                 {
                     Console.WriteLine(session.ToString());
                 }
+                Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("###### Total Cost: {0}", subscriber.GetTotalCost());
-                Console.WriteLine();
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("=====================================");
             }
         }
 
@@ -112,13 +123,21 @@ namespace ATS
             Thread.Sleep(rand_time.Next(10, 80));
         }
 
-        static void RandomConversations(List<Subscriber> subscribers, int count)
+        static void RandomConversations(ATS ats, List<Subscriber> subscribers, int count)
         {
             Random r = new Random();
             for (int i = 0; i < count; i++)
             {
                 int sub1 = r.Next(subscribers.Count);
                 int sub2 = r.Next(subscribers.Count);
+
+                // subscribers try to pay services to be able call
+                if (r.Next(10) == 0)
+                {
+                    ats.Pay(subscribers[sub1].Telephone.TelephoneNumber, subscribers[sub1].Contract.ToPay);
+                    ats.Pay(subscribers[sub2].Telephone.TelephoneNumber, subscribers[sub2].Contract.ToPay);
+                }
+
                 subscribers[sub1].Call(subscribers[sub2].Telephone.TelephoneNumber);
                 Sleep(r);
                 if (sub1 == sub2) subscribers[sub1].Abort();

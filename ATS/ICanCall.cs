@@ -10,6 +10,6 @@ namespace ATS
     {
         void Call(TelephoneNumber number);
         void Abort();
-        void RecieveCall();
+        void AcceptCall();
     }    
 }
