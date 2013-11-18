@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Configuration;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,13 +10,25 @@ namespace ATS
 {
     class Program
     {
+        /*
+         * Config file should have this
+         * 
+        <appSettings>
+            <add key="Name" value="Alexey,George,Paolo,Elizabet,Franz,Ivan,Daniela,Ksenia" />
+            <add key="City" value="Grodno,New-York,Brazilia,London,Paris,Moscow,Spain,Minsk"/>
+            <add key="Tarrif" value="Cheap,Middle,Expensive,Cheap,Cheap,Middle,Middle,Cheap"/>
+            <add key="conversationsCount" value="100"/>
+          </appSettings>
+        */
         static void Main(string[] args)
         {
+            int conversationsCount = int.Parse(ConfigurationManager.AppSettings["conversationsCount"]);
+
             ATS ats = new ATS(10, "Owner");
             ats.AddStand();
-            Random rand_time = new Random();
             List<Subscriber> subscribers = GenerateSubscribers(ats);
 
+            #region fast Little test
             /*
             // 1
             subscribers[0].Call(subscribers[1].Telephone.TelephoneNumber);
@@ -36,8 +49,9 @@ namespace ATS
             subscribers[1].Abort();
             subscribers[2].Abort();
             */
-            
-            RandomConversations(ats,subscribers, 100);
+            #endregion
+
+            RandomConversations(ats, subscribers, conversationsCount);
             
             ShowStatForEach(subscribers);
 
@@ -46,29 +60,20 @@ namespace ATS
 
         static List<Subscriber> GenerateSubscribers(ATS ats)
         {
-            Subscriber s1 = new Subscriber(0, "Alexey", "Grodno");
-            Subscriber s2 = new Subscriber(2, "George", "New-York");
-            Subscriber s3 = new Subscriber(3, "Paolo", "Brazilia");
-            Subscriber s4 = new Subscriber(4, "Elizabet", "Britain");
-            Subscriber s5 = new Subscriber(5, "Franz", "Paris");
-            Subscriber s6 = new Subscriber(6, "Ivan", "Moscow");
-            Subscriber s7 = new Subscriber(7, "Daniela", "Spain");
-            Subscriber s8 = new Subscriber(8, "Ksenia", "Minsk");
-            List<Subscriber> subs = new List<Subscriber>() { s1, s2, s3, s4, s5, s6, s7, s8 };
+            var keys = ConfigurationManager.AppSettings.AllKeys;
+            var names = ConfigurationManager.AppSettings[keys[0]].Split(',');
+            var cities = ConfigurationManager.AppSettings[keys[1]].Split(',');
+            var tarrifs = ConfigurationManager.AppSettings[keys[2]].Split(',');
 
-            ats.SignContract(s1, Tarrifs.Cheap);
-            ats.SignContract(s2, Tarrifs.Middle);
-            ats.SignContract(s3, Tarrifs.Expensive);
-            ats.SignContract(s4, Tarrifs.Cheap);
-            ats.SignContract(s5, Tarrifs.Cheap);
-            ats.SignContract(s6, Tarrifs.Middle);
-            ats.SignContract(s7, Tarrifs.Middle);
-            ats.SignContract(s8, Tarrifs.Cheap);
-
-            foreach (var sub in subs)
+            List<Subscriber> subs = new List<Subscriber>();
+            for (int i = 0; i < names.Length; i++)
             {
+                Subscriber sub = new Subscriber(i, names[i], cities[i]);
+                ats.SignContract(sub, (Tarrifs)Enum.Parse(typeof(Tarrifs), tarrifs[i]));
                 sub.Telephone.ConnectTo(ats[sub.Contract.StandID][sub.Contract.PortID]);
                 sub.ListenBell += sub_ListenBell;
+
+                subs.Add(sub);
             }
 
             return subs;
@@ -94,8 +99,10 @@ namespace ATS
             foreach (var subscriber in subscribers)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
+                Console.BackgroundColor = ConsoleColor.White;
                 Console.WriteLine("###### Statistic of: {0}. Tariff: {1}",
                     subscriber.Name, subscriber.Contract.Tarrif.TarrifType);
+                Console.ResetColor();
                 Console.ForegroundColor = ConsoleColor.DarkGreen;
                 Console.WriteLine("Should pay: {0} $", subscriber.Contract.ToPay);
 
@@ -112,7 +119,7 @@ namespace ATS
                     Console.WriteLine(session.ToString());
                 }
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("###### Total Cost: {0}", subscriber.GetTotalCost());
+                Console.WriteLine("###### Total Cost of conversations: {0}", subscriber.GetTotalCost());
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine("=====================================");
             }
