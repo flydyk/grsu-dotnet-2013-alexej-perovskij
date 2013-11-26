@@ -1,45 +1,33 @@
 ﻿using System;
-using System.Configuration;
-using System.Diagnostics;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using System.ServiceProcess;
-using System.Threading;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace GoodsCollectorServ
+namespace GoodsCollectorServ.TODO
 {
-    public partial class CSVWatcherServ : ServiceBase
+    public class CSVFileProcessor
     {
-        FileSystemWatcher watcher;
+        private static Action<string> tracer;
 
-        public CSVWatcherServ()
+        public static Action<string> Tracer
         {
-            InitializeComponent();
+            get { return tracer; }
+            set { tracer = value; }
         }
 
-        protected override void OnStart(string[] args)
+        public static void ProcessFolder(string folderPath)
         {
-            AddLog("start");
-            string dir = ConfigurationManager.AppSettings["dirToWatch"];
-            watcher = new FileSystemWatcher(dir, "*.csv");
-            watcher.Created += watcher_Created;
-            watcher.EnableRaisingEvents = true;Program
-        }
+            var fileNames = Directory.GetFiles(folderPath, "*.csv", SearchOption.TopDirectoryOnly);
 
-        protected override void OnStop()
-        {
-             if (watcher != null)
-                watcher.Dispose();
-
-             AddLog("stop");
+            foreach (var fileName in fileNames)
+            {
+                ProcessFile(fileName);
+            }
         }
-
-        private void watcher_Created(object sender, FileSystemEventArgs e)
-        {
-            ThreadPool.QueueUserWorkItem(ProcessCSVFile, e.FullPath);
-        }
-        
-        private void ProcessCSVFile(object filePath)
+        public static void ProcessFile(object filePath)
         {
             var path = (string)filePath;
             var fileName = Path.GetFileNameWithoutExtension(path);
@@ -49,12 +37,12 @@ namespace GoodsCollectorServ
                 ParseFileName(fileName, stockInfo);
                 ParseFile(path, stockInfo);
             }
-            //catch (FormatException fe) { AddLog(fe.Message); }
-            //catch (InvalidOperationException ioe) { AddLog(ioe.Message); }
-            catch (Exception e) { AddLog(e.Message); }
+            //catch (FormatException fe) { logging(fe.Message); }
+            //catch (InvalidOperationException ioe) { logging(ioe.Message); }
+            catch (Exception e) { tracer(e.Message); }
         }
 
-        private void ParseFile(string path, DataBase.Stock stockInfo)
+        private static void ParseFile(string path, DataBase.Stock stockInfo)
         {
             if (File.Exists(path))
             {
@@ -75,22 +63,22 @@ namespace GoodsCollectorServ
                             stock.Client = columns[0];
                             stock.GoodsID = int.Parse(columns[1]);
                             stock.Cost = decimal.Parse(columns[2]);
-                            
+
                             db.Stocks.Add(stock);
                         }
-                        AddLog("saving " + path);
+                        tracer("saving " + path);
                         db.SaveChanges();
-                        AddLog("saved " + path);
+                        tracer("saved " + path);
                     }
                 }
-                catch(InvalidOperationException ioe)
+                catch (InvalidOperationException ioe)
                 {
                     throw ioe;
                 }
             }
         }
 
-        private void ParseFileName(string fileName, DataBase.Stock stock)
+        private static void ParseFileName(string fileName, DataBase.Stock stock)
         {
             var stockInfo = fileName.Split('_');
             try
@@ -99,20 +87,6 @@ namespace GoodsCollectorServ
                 stock.Date = DateTime.ParseExact(stockInfo[2], "ddMMyyyy", CultureInfo.InvariantCulture);
             }
             catch { throw new FormatException(string.Format("FileName [{0}] have invalid format", fileName)); }
-        }
-
-        private void AddLog(string log)
-        {
-            try
-            {
-                if (!EventLog.SourceExists("CSVWatcherServ"))
-                {
-                    EventLog.CreateEventSource("CSVWatcherServ", "CSVWatcherServ");
-                }
-                eventLog1.Source = "CSVWatcherServ";
-                eventLog1.WriteEntry(log);
-            }
-            catch { }
         }
     }
 }
