@@ -1,6 +1,6 @@
-﻿namespace GoodsCollectorServ
+﻿namespace GoodsCollectorService
 {
-    partial class CSVWatcherServ
+    partial class CSVWatcherService
     {
         /// <summary> 
         /// Required designer variable.

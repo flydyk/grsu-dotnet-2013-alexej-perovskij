@@ -1,5 +1,5 @@
 ﻿
-namespace GoodsCollectorServ
+namespace GoodsCollectorService
 {
     static class Program
     {

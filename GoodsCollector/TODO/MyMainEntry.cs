@@ -7,7 +7,7 @@ using System.ServiceProcess;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GoodsCollectorServ.TODO
+namespace GoodsCollectorService.TODO
 {
     internal class MyMainEntry
     {
@@ -26,6 +26,12 @@ namespace GoodsCollectorServ.TODO
                             case "/install":
                                 ManagedInstallerClass.InstallHelper(new string[] { Assembly.GetExecutingAssembly().Location });
                                 return;
+                            case "/start":
+                                new ServiceController("CSVWatcherService").Start();
+                                break;
+                            case "/stop":
+                                new ServiceController("CSVWatcherService").Stop();
+                                break;
                             case "/uninstall":
                                 ManagedInstallerClass.InstallHelper(new string[] { "/u", Assembly.GetExecutingAssembly().Location });
                                 return;
@@ -44,7 +50,7 @@ namespace GoodsCollectorServ.TODO
                 ServiceBase[] ServicesToRun;
                 ServicesToRun = new ServiceBase[]
                 { 
-                new CSVWatcherServ() 
+                new CSVWatcherService() 
                 };
                 ServiceBase.Run(ServicesToRun);
             }
@@ -59,7 +65,7 @@ namespace GoodsCollectorServ.TODO
             Console.WriteLine("/uninstall\nUninstall service installed from this app");
             Console.WriteLine("[Folder Name]\nProcess \"folder name\"");
             Console.ReadLine();
-            
+
         }
 
         private static void ShowProcessing(string obj)

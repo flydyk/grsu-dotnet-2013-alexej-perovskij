@@ -7,7 +7,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace GoodsCollectorServ.DataBase
+namespace GoodsCollectorService.DataBase
 {
     using System;
     using System.Collections.Generic;

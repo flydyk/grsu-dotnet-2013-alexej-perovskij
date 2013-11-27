@@ -1,4 +1,4 @@
-﻿namespace GoodsCollectorServ
+﻿namespace GoodsCollectorService
 {
     partial class ProjectInstaller
     {
@@ -41,8 +41,7 @@
             // 
             this.serviceInstaller1.Description = "Watch special local directory. DirName=\"e:\\repo_dir\"";
             this.serviceInstaller1.DisplayName = "CSVWatcher";
-            this.serviceInstaller1.ServiceName = "CSVWatcherServ";
-            this.serviceInstaller1.StartType = System.ServiceProcess.ServiceStartMode.Automatic;
+            this.serviceInstaller1.ServiceName = "CSVWatcherService";
             // 
             // ProjectInstaller
             // 

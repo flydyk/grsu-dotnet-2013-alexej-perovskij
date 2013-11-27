@@ -6,13 +6,13 @@ using System.IO;
 using System.ServiceProcess;
 using System.Threading;
 
-namespace GoodsCollectorServ
+namespace GoodsCollectorService
 {
-    public partial class CSVWatcherServ : ServiceBase
+    public partial class CSVWatcherService : ServiceBase
     {
         FileSystemWatcher watcher;
 
-        public CSVWatcherServ()
+        public CSVWatcherService()
         {
             InitializeComponent();
         }
@@ -42,13 +42,14 @@ namespace GoodsCollectorServ
         
         private void AddLog(string log)
         {
+            string serviceName = "CSVWatcherService";
             try
             {
-                if (!EventLog.SourceExists("CSVWatcherServ"))
+                if (!EventLog.SourceExists(serviceName))
                 {
-                    EventLog.CreateEventSource("CSVWatcherServ", "CSVWatcherServ");
+                    EventLog.CreateEventSource(serviceName, serviceName);
                 }
-                eventLog1.Source = "CSVWatcherServ";
+                eventLog1.Source = serviceName;
                 eventLog1.WriteEntry(log);
             }
             catch { }
