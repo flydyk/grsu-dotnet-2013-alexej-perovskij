@@ -22,25 +22,34 @@ namespace GoodsCollectorService.TODO
                         ShowHelp();
                         break;
                     case 1:
-                        switch (args[0])
+                        try
                         {
-                            case "/install":
-                                ManagedInstallerClass.InstallHelper(new string[] { Assembly.GetExecutingAssembly().Location });
-                                return;
-                            case "/start":
-                                new ServiceController("CSVWatcherService").Start();
-                                break;
-                            case "/stop":
-                                new ServiceController("CSVWatcherService").Stop();
-                                break;
-                            case "/uninstall":
-                                ManagedInstallerClass.InstallHelper(new string[] { "/u", Assembly.GetExecutingAssembly().Location });
-                                return;
-                            default:
-                                CSVFileProcessor.Tracer = ShowProcessing;
-                                CSVFileProcessor.ProcessFolder(args[0]);
-                                break;
+                            switch (args[0])
+                            {
+                                case "/install":
+                                    ManagedInstallerClass.InstallHelper(new string[] { Assembly.GetExecutingAssembly().Location });
+                                    return;
+                                case "/start":
+                                    new ServiceController("CSVWatcherService").Start();
+                                    break;
+                                case "/stop":
+                                    new ServiceController("CSVWatcherService").Stop();
+                                    break;
+                                case "/uninstall":
+                                    using (var serv = new ServiceController("CSVWatcherService"))
+                                    {
+                                        if (serv.Status != ServiceControllerStatus.Stopped)
+                                            serv.Stop();
+                                    }
+                                    ManagedInstallerClass.InstallHelper(new string[] { "/u", Assembly.GetExecutingAssembly().Location });
+                                    return;
+                                default:
+                                    CSVFileProcessor.Tracer = ShowProcessing;
+                                    CSVFileProcessor.ProcessFolder(args[0]);
+                                    break;
+                            }
                         }
+                        catch { }
                         break;
                     default:
                         break;
