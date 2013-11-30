@@ -4,6 +4,7 @@ using System.Configuration.Install;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.ServiceProcess;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,6 +13,10 @@ namespace GoodsCollectorService.TODO
 {
     internal class MyMainEntry
     {
+        [DllImport("kernel32.dll")]
+        static extern bool AttachConsole(int dwProcessId);
+        private const int ATTACH_PARENT_PROCESS = -1;
+
         public static void MyMain(string[] args)
         {
             if (Environment.UserInteractive)
@@ -19,6 +24,7 @@ namespace GoodsCollectorService.TODO
                 switch (args.Length)
                 {
                     case 0:
+                        AttachConsole(ATTACH_PARENT_PROCESS);
                         ShowHelp();
                         break;
                     case 1:
@@ -44,6 +50,7 @@ namespace GoodsCollectorService.TODO
                                     ManagedInstallerClass.InstallHelper(new string[] { "/u", Assembly.GetExecutingAssembly().Location });
                                     return;
                                 default:
+                                    AttachConsole(ATTACH_PARENT_PROCESS);
                                     CSVFileProcessor.Tracer = ShowProcessing;
                                     CSVFileProcessor.ProcessFolder(args[0]);
                                     break;
