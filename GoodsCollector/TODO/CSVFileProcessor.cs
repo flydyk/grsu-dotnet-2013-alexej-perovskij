@@ -34,12 +34,20 @@ namespace GoodsCollectorService.TODO
             DataBase.Stock stockInfo = new DataBase.Stock();
             try
             {
-                ParseFileName(fileName, stockInfo);
+                if (!ParseFileName(fileName, stockInfo))
+                    throw new ApplicationException("File had been alreade processed\n" + filePath);
                 ParseFile(path, stockInfo);
+
+                File.Move(path, AppendToFileName(path, "_done_" + DateTime.Now.Ticks));
             }
             //catch (FormatException fe) { logging(fe.Message); }
             //catch (InvalidOperationException ioe) { logging(ioe.Message); }
-            catch (Exception e) { tracer(e.Message); }
+            catch (Exception e)
+            {
+                if (Tracer != null)
+                    Tracer(e.Message);
+                else throw e;
+            }
         }
 
         private static void ParseFile(string path, DataBase.Stock stockInfo)
@@ -49,8 +57,10 @@ namespace GoodsCollectorService.TODO
                 try
                 {
                     var rows = File.ReadAllLines(path);
+                    
                     using (DataBase.ProductionEntities db = new DataBase.ProductionEntities())
                     {
+                        
                         foreach (var row in rows)
                         {
                             var stock = new DataBase.Stock()
@@ -66,10 +76,12 @@ namespace GoodsCollectorService.TODO
 
                             db.Stocks.Add(stock);
                         }
-                        tracer("saving " + path);
+                        if (Tracer != null)
+                            Tracer("saving " + path);
                         db.SaveChanges();
-                        tracer("saved " + path);
-                    }
+                        if (Tracer != null)
+                            Tracer("saved " + path);
+                    }                    
                 }
                 catch (InvalidOperationException ioe)
                 {
@@ -78,13 +90,25 @@ namespace GoodsCollectorService.TODO
             }
         }
 
-        private static void ParseFileName(string fileName, DataBase.Stock stock)
+        private static string AppendToFileName(string path, string append)
+        {
+            var dir = Path.GetDirectoryName(path);
+            var oldName = new StringBuilder(Path.GetFileNameWithoutExtension(path));
+            var ext = new StringBuilder(Path.GetExtension(path));
+
+            return Path.Combine(dir, oldName.Append(append).Append(ext).ToString());
+        }
+
+        private static bool ParseFileName(string fileName, DataBase.Stock stock)
         {
             var stockInfo = fileName.Split('_');
+            if (stockInfo.Length > 2 && stockInfo[2] == "done")
+                return false;
             try
             {
-                stock.ManagerID = int.Parse(stockInfo[1]);
-                stock.Date = DateTime.ParseExact(stockInfo[2], "ddMMyyyy", CultureInfo.InvariantCulture);
+                stock.ManagerID = int.Parse(stockInfo[0]);
+                stock.Date = DateTime.ParseExact(stockInfo[1], "ddMMyyyy", CultureInfo.InvariantCulture);
+                return true;
             }
             catch { throw new FormatException(string.Format("FileName [{0}] have invalid format", fileName)); }
         }

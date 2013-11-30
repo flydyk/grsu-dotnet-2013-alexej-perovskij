@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration.Install;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.ServiceProcess;
@@ -64,7 +65,6 @@ namespace GoodsCollectorService.TODO
             Console.WriteLine("/install\nInstall this app as service");
             Console.WriteLine("/uninstall\nUninstall service installed from this app");
             Console.WriteLine("[Folder Name]\nProcess \"folder name\"");
-            Console.ReadLine();
 
         }
 

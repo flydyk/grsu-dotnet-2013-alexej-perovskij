@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ATS", "ATS\ATS.csproj", "{7
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GoodsCollectorServ", "GoodsCollector\GoodsCollectorServ.csproj", "{45A0E414-BD62-408D-9B0E-8A580D4C3294}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "for_tests_only", "for_tests_only\for_tests_only.csproj", "{0660B266-8E40-46B6-AF27-EBB2ADAF460B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{45A0E414-BD62-408D-9B0E-8A580D4C3294}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{45A0E414-BD62-408D-9B0E-8A580D4C3294}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{45A0E414-BD62-408D-9B0E-8A580D4C3294}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0660B266-8E40-46B6-AF27-EBB2ADAF460B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0660B266-8E40-46B6-AF27-EBB2ADAF460B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0660B266-8E40-46B6-AF27-EBB2ADAF460B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0660B266-8E40-46B6-AF27-EBB2ADAF460B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
