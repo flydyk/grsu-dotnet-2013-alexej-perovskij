@@ -76,12 +76,13 @@ namespace GoodsCollectorService.TODO
         private static void ShowHelp()
         {
             Console.WriteLine(
-                "This application was made to watch special folder \"E:\\rep_csv\" and to write data from them into DataBase %\\Prodution.mdf");
+                "\nThis application was made to watch special folder \"E:\\rep_csv\" and to write data from them into DataBase %\\Prodution.mdf");
             Console.WriteLine("Commands:\n");
-            Console.WriteLine("/install\nInstall this app as service");
-            Console.WriteLine("/uninstall\nUninstall service installed from this app");
-            Console.WriteLine("[Folder Name]\nProcess \"folder name\"");
-
+            Console.WriteLine("/install\tInstall this app as service");
+            Console.WriteLine("/uninstall\tUninstall service installed from this app");
+            Console.WriteLine("/start\t\tStart service which was installed from this app");
+            Console.WriteLine("/stop\t\tStop service which was installed from this app");
+            Console.WriteLine("[Folder Name]\tProcess \"folder name\"");
         }
 
         private static void ShowProcessing(string obj)
