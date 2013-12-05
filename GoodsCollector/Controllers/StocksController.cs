@@ -38,7 +38,7 @@ namespace GoodsCollectorService.Controllers
             }
         }
 
-        private List<Stock> ExtractStocks(string path)
+        private  List<Stock> ExtractStocks(string path)
         {
             try
             {
@@ -66,7 +66,9 @@ namespace GoodsCollectorService.Controllers
             List<DataBase.Stock> stocks = new List<DataBase.Stock>();
             try
             {
-                Parallel.ForEach(fileNames, (s) =>
+                //Parallel.ForEach(fileNames, (s) =>
+                //{
+                foreach (var s in fileNames)
                 {
                     var _stocks = ExtractStocks(s);
                     if (_stocks != null)
@@ -74,10 +76,14 @@ namespace GoodsCollectorService.Controllers
                         stocks.AddRange(_stocks);
                         Tracer(string.Format("File {0} was successfuly processed", s));
                     }
-                });
-                Tracer("saving");
-                dbfunc.AddSaveItems<Stock>(stocks);
-                Tracer("saved");
+                }
+                //});
+                if (stocks.Count != 0)
+                {
+                    Tracer("saving");
+                    dbfunc.AddSaveItems<Stock>(stocks);
+                    Tracer("saved");
+                }
             }
             catch (Exception e)
             {
