@@ -5,6 +5,7 @@ using System.Globalization;
 using System.IO;
 using System.ServiceProcess;
 using System.Threading;
+using GoodsCollectorService.Controllers;
 
 namespace GoodsCollectorService
 {
@@ -19,7 +20,7 @@ namespace GoodsCollectorService
 
         protected override void OnStart(string[] args)
         {
-            TODO.CSVFileProcessor.Tracer = AddLog;
+            ThreadPool.SetMaxThreads(10, 100);
             AddLog("start");
             string dir = ConfigurationManager.AppSettings["dirToWatch"];
             watcher = new FileSystemWatcher(dir, "*.csv");
@@ -29,17 +30,31 @@ namespace GoodsCollectorService
 
         protected override void OnStop()
         {
-             if (watcher != null)
+            if (watcher != null)
                 watcher.Dispose();
 
-             AddLog("stop");
+            AddLog("stop");
         }
 
         private void watcher_Created(object sender, FileSystemEventArgs e)
         {
-            ThreadPool.QueueUserWorkItem(TODO.CSVFileProcessor.ProcessFile, e.FullPath);
+            ThreadPool.QueueUserWorkItem(ProcessFile, e.FullPath);
         }
-        
+
+        private void ProcessFile(object state)
+        {
+            try
+            {
+                var path = (string)state;
+                using (StocksController c = new StocksController())
+                {
+                    c.Tracer = AddLog;
+                    c.AddStocksFromFile(path);
+                }
+            }
+            catch (Exception e) { AddLog(e.Message); }
+        }
+
         private void AddLog(string log)
         {
             string serviceName = "CSVWatcherService";

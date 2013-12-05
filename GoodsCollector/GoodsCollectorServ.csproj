@@ -72,6 +72,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controllers\StocksController.cs" />
+    <Compile Include="DataBase\DBFunctionality.cs" />
+    <Compile Include="ConsoleRunner.cs" />
     <Compile Include="TODO\CSVWatcherService.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -104,6 +107,7 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="TODO\CSVFileProcessor.cs" />
+    <Compile Include="TODO\NullTracer.cs" />
     <Compile Include="TODO\ProjectInstaller.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -111,7 +115,6 @@
       <DependentUpon>ProjectInstaller.cs</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TODO\MyMainEntry.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">

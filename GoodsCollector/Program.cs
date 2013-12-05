@@ -1,4 +1,6 @@
 ﻿
+using System;
+using System.ServiceProcess;
 namespace GoodsCollectorService
 {
     static class Program
@@ -8,7 +10,19 @@ namespace GoodsCollectorService
         /// </summary>
         static void Main(string[] args)
         {
-            TODO.MyMainEntry.MyMain(args);
+            if (Environment.UserInteractive)
+            {
+                ConsoleRunner.ConsoleMain(args);
+            }
+            else
+            {
+                ServiceBase[] ServicesToRun;
+                ServicesToRun = new ServiceBase[]
+                { 
+                new CSVWatcherService() 
+                };
+                ServiceBase.Run(ServicesToRun);
+            }
         }
     }
 }
