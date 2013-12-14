@@ -1,0 +1,34 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Data Base";
+}
+
+<h1>@ViewBag.Title Production</h1>
+<h2>Tables</h2>
+<div class="table">
+    <div class="row">
+        <div class="col-md-3">
+            <p><img class="img-thumbnail" src="/Content/Images/manager.jpg" alt="Managers" /></p>
+        </div>
+        <div class="col-md-3">
+            <p><img class="img-thumbnail" src="/Content/Images/goods_min.jpg" alt="Goods" /></p>
+        </div>
+        <div class="col-md-3">
+            <p><img class="img-thumbnail" src="/Content/Images/stock_min_1.jpg" alt="Stocks" /></p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-3">
+            <p><a href=@Url.Action("Index", "Manager") class="btn btn-primary btn-large">Managers &raquo;</a></p>
+            <p>Table Managers contains info about all managers in MyCompany.</p>
+        </div>
+        <div class="col-md-3">
+            <p><a href=@Url.Action("Index", "Good") class="btn btn-primary btn-large">Goods &raquo;</a></p>
+            <p>Table Goods contains info about all goods in MyCompany which are sold now.</p>
+        </div>
+        <div class="col-md-3">
+            <p><a href=@Url.Action("Index", "Stock") class="btn btn-primary btn-large">Stocks &raquo;</a></p>
+            <p>Table Stocks contains info about trading operations which were made managers in MyCompany.</p>
+        </div>
+    </div>
+</div>
