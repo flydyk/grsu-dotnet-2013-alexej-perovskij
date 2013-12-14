@@ -49,7 +49,6 @@ namespace MyCompanySellInfo.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "canEdit,canDelete")]
         public ActionResult Create([Bind(Include="Id,Name,Producer,Cost")] Good good)
         {
             if (ModelState.IsValid)
@@ -83,7 +82,6 @@ namespace MyCompanySellInfo.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "canEdit,canDelete")]
         public ActionResult Edit([Bind(Include="Id,Name,Producer,Cost")] Good good)
         {
             if (ModelState.IsValid)
@@ -112,7 +110,6 @@ namespace MyCompanySellInfo.Controllers
         }
 
         // POST: /Good/Delete/5
-        [Authorize(Roles = "canDelete")]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(int id)

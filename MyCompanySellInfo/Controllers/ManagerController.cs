@@ -15,13 +15,14 @@ namespace MyCompanySellInfo.Controllers
         private ProductionEntities db = new ProductionEntities();
 
         // GET: /Manager/
-        [Authorize(Roles = "canEdit")]
+        [Authorize(Roles = "canEdit,canDelete")]
         public ActionResult Index()
         {
             return View(db.Managers.ToList());
         }
 
         // GET: /Manager/Details/5
+        [Authorize(Roles = "canEdit,canDelete")]
         public ActionResult Details(int? id)
         {
             if (id == null)
@@ -72,6 +73,7 @@ namespace MyCompanySellInfo.Controllers
         }
 
         // GET: /Manager/Create
+        [Authorize(Roles = "canEdit,canDelete")]
         public ActionResult Create()
         {
             return View();
@@ -82,6 +84,7 @@ namespace MyCompanySellInfo.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "canEdit,canDelete")]
         public ActionResult Create([Bind(Include="Id,FirstName,LastName")] Manager manager)
         {
             if (ModelState.IsValid)
@@ -95,6 +98,7 @@ namespace MyCompanySellInfo.Controllers
         }
 
         // GET: /Manager/Edit/5
+        [Authorize(Roles = "canEdit,canDelete")]
         public ActionResult Edit(int? id)
         {
             if (id == null)
@@ -114,6 +118,7 @@ namespace MyCompanySellInfo.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "canEdit,canDelete")]
         public ActionResult Edit([Bind(Include="Id,FirstName,LastName")] Manager manager)
         {
             if (ModelState.IsValid)
@@ -126,6 +131,7 @@ namespace MyCompanySellInfo.Controllers
         }
 
         // GET: /Manager/Delete/5
+        [Authorize(Roles = "canDelete")]
         public ActionResult Delete(int? id)
         {
             if (id == null)
@@ -143,6 +149,7 @@ namespace MyCompanySellInfo.Controllers
         // POST: /Manager/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "canDelete")]
         public ActionResult DeleteConfirmed(int id)
         {
             Manager manager = db.Managers.Find(id);
