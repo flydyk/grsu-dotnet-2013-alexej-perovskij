@@ -15,14 +15,14 @@ namespace MyCompanySellInfo.Controllers
         private ProductionEntities db = new ProductionEntities();
 
         // GET: /Manager/
-        [Authorize(Roles = "canEdit,canDelete")]
+        [Authorize]
         public ActionResult Index()
         {
             return View(db.Managers.ToList());
         }
 
         // GET: /Manager/Details/5
-        [Authorize(Roles = "canEdit,canDelete")]
+        [Authorize]
         public ActionResult Details(int? id)
         {
             if (id == null)

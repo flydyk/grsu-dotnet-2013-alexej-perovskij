@@ -1,5 +1,11 @@
-﻿@model IEnumerable<MyCompanySellInfo.Models.Stock>
+﻿@model PagedList.IPagedList<MyCompanySellInfo.Models.Stock>
+@using PagedList.Mvc;
+@using MyCompanySellInfo.Helpers
+@using MyCompanySellInfo.Models
+<link href="~/Content/PagedList.css" rel="stylesheet" type="text/css" />
+
 @{
+    Stock stock = new Stock();
     ViewBag.Title = "Stocks";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
@@ -17,28 +23,80 @@
 @using (Html.BeginForm("Index", "Stock", FormMethod.Get))
 {
     <p>
-        Filter by: @Html.DropDownList("searchItem")
-        Search: @Html.TextBox("searchString")
-        <input type="submit" value="Search" />
+        Filter by: @Html.DropDownList("searchItem", ViewBag.searchItems as SelectList)
+        Search: @Html.TextBox("searchString", "find out ...")
+        <input type="submit" value="Search" class="btn btn-default" />
+        @Html.ActionLink("Reset", "Index", null, new { @class = "btn btn-default", @type = "button" })
     </p>
 }
 
 <table class="table">
     <tr>
         <th>
-            @Html.DisplayNameFor(model => model.Client)
+            @Html.ActionLink(Html.DisplayNameFor(model => model.FirstOrDefault().Client).ToHtmlString(), "Index",
+            new
+            {
+                order = (ViewBag.order != null) ? (
+                ViewBag.order == OrderFilters.Client ?
+                OrderFilters.ClientDesc :
+                OrderFilters.Client) :
+                OrderFilters.Client
+                ,
+                searchItem = ViewBag.searchItem,
+                searchString = ViewBag.searchString,
+                page = ViewBag.page
+            })
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.Date)
+            @Html.ActionLink(Html.DisplayNameFor(model => model.FirstOrDefault().Date).ToHtmlString(), "Index",
+            new
+            {
+                order = (ViewBag.order != null) ? (
+                ViewBag.order == OrderFilters.Date ?
+                OrderFilters.DateDesc :
+                OrderFilters.Date
+                ) :
+                OrderFilters.Date
+                ,
+                searchItem = ViewBag.searchItem,
+                searchString = ViewBag.searchString,
+                page = ViewBag.page
+            })
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.Cost)
+            @Html.DisplayNameFor(model => model.FirstOrDefault().Cost)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.Good.Name)
+            @Html.ActionLink(Html.DisplayNameFor(model => model.FirstOrDefault().Good.Name).ToHtmlString(), "Index",
+            new
+            {
+                order = (ViewBag.order != null) ? (
+                ViewBag.order == OrderFilters.Goods ?
+                OrderFilters.GoodsDesc :
+                OrderFilters.Goods
+                ) :
+                OrderFilters.Goods
+                ,
+                searchItem = ViewBag.searchItem,
+                searchString = ViewBag.searchString,
+                page = ViewBag.page
+            })
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.Manager)
+            @Html.ActionLink(Html.DisplayNameFor(model => model.FirstOrDefault().Manager).ToHtmlString(), "Index",
+            new
+            {
+                order = (ViewBag.order != null) ? (
+                ViewBag.order == OrderFilters.Manager ?
+                OrderFilters.ManagerDesc :
+                OrderFilters.Manager
+                ) :
+                OrderFilters.Manager
+                ,
+                searchItem = ViewBag.searchItem,
+                searchString = ViewBag.searchString,
+                page = ViewBag.page
+            })
         </th>
         <th>Action</th>
     </tr>
@@ -82,8 +140,19 @@
             </td>
         </tr>
     }
-
 </table>
+<br />
+Page @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) of @Model.PageCount
+
+@Html.PagedListPager(Model, page =>
+    Url.Action("Index", new
+    {
+        searchItem = ViewBag.searchItem,
+        searchString = ViewBag.searchString,
+        order = ViewBag.order,
+        page
+    })
+    )
 <div class="row">
     <div class="col-md-5">
         <div id="piechart0" style="width: 600px; height: 400px;"></div>

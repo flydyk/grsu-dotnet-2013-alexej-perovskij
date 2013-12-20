@@ -7,54 +7,46 @@ using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using MyCompanySellInfo.Models;
+using MyCompanySellInfo.Helpers;
 using System.Globalization;
+using PagedList;
 
 namespace MyCompanySellInfo.Controllers
 {
     public class StockController : Controller
     {
         private ProductionEntities db = new ProductionEntities();
+        private static int pageSize = 10;
 
         // GET: /Stock/
-        [Authorize(Roles = "canEdit,canDelete")]
-        public ActionResult Index(string searchItem, string searchString)
+        [Authorize]
+        public ActionResult Index
+            (
+            string searchString,
+            SearchFilters searchItem = SearchFilters.None,
+            OrderFilters order = OrderFilters.None,
+            int page = 1
+            )
         {
-            var searchItems = new List<string>() { "Manager", "Date", "Goods Name" };
 
-            if (!searchItems.Contains(searchItem))
-                // Generate error or something
-                ;
-
-            ViewBag.searchItem = new SelectList(searchItems, searchItem);
+            ViewBag.order = order;
+            ViewBag.searchItems = new SelectList(Enum.GetNames(typeof(SearchFilters)), searchItem);
+            ViewBag.searchItem = searchItem;
             ViewBag.searchString = searchString;
+            ViewBag.page = page;
+
             var stocks = db.Stocks.Include(s => s.Good).Include(s => s.Manager);
+
             if (!String.IsNullOrEmpty(searchString) &&
-                !String.IsNullOrEmpty(searchItem))
+                searchItem != SearchFilters.None)
             {
-                switch (searchItem)
-                {
-                    case "Manager":
-                        stocks = stocks.Where(s =>
-                            s.Manager.FirstName.Contains(searchString) ||
-                            s.Manager.LastName.Contains(searchString));
-                        break;
-                    case "Date":
-                        DateTime date;
-                        bool success = DateTime.TryParseExact(searchString, "dd-MM-yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out date);
-                        if (success)
-                        {
-                            stocks = stocks.Where(s => s.Date.Equals(date));
-                        }
-                        break;
-                    case "Goods Name":
-                        stocks = stocks.Where(s => s.Good.Name.Contains(searchString));
-                        break;
-                    default:
-                        break;
-                }
+                DataProcessor.FilterStocks(ref stocks, searchItem, searchString);
             }
 
-            return View(stocks.ToList());
+            DataProcessor.OrderStocks( ref stocks, order);
+
+
+            return View(stocks.ToPagedList(page, pageSize));
         }
 
         [AcceptVerbs(HttpVerbs.Get)]
@@ -104,7 +96,7 @@ namespace MyCompanySellInfo.Controllers
 
 
         // GET: /Stock/Details/5
-        [Authorize(Roles = "canEdit,canDelete")]
+        [Authorize]
         public ActionResult Details(int? id)
         {
             if (id == null)
