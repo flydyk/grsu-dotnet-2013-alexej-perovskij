@@ -7,27 +7,26 @@
 
 <h2>ViewBag.Title</h2>
 
-
-<div class="form-horizontal">
+<div>
     <h4>User</h4>
     <hr />
-    <div class="form-group">
-        @Html.LabelFor(model => model.UserName, new { @class = "control-label col-md-2" })
-        <div class="col-md-10">
-            @Html.DisplayTextFor(model => model.UserName)
-            @Html.ValidationMessageFor(model => model.UserName)
-        </div>
-    </div>
-
-    <div class="form-group">
-        @Html.LabelFor(model => model.Role, new { @class = "control-label col-md-2" })
-        <div class="col-md-10">
-            @Html.DisplayTextFor(model => model.Role)
-            @Html.ValidationMessageFor(model => model.Role)
-        </div>
-    </div>
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.UserName)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.UserName)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Role)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Role)
+        </dd>
+    </dl>
 </div>
 
+<hr />
 @using (Html.BeginForm())
 {
     @Html.AntiForgeryToken()
@@ -38,8 +37,8 @@
         @Html.HiddenFor(model => model.Id)
 
         <div class="form-group">
-            @Html.LabelFor(model => model.Role, new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
+            <label class="control-label col-md-2">Change current Role</label>
+            <div class="col-md-5">
                 @Html.DropDownList("Role", new SelectList(Enum.GetNames(typeof(RolesEnum))), new { @class = "form-control" })
             </div>
         </div>

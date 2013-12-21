@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using MyCompanySellInfo.Helpers;
+using System.ComponentModel.DataAnnotations;
 
 namespace MyCompanySellInfo.Models
 {
@@ -59,5 +60,9 @@ namespace MyCompanySellInfo.Models
         [Display(Name = "Confirm password")]
         [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
         public string ConfirmPassword { get; set; }
+
+        [Required]
+        [Display(Name = "User role")]
+        public RolesEnum Role { get; set; }
     }
 }

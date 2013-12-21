@@ -6,7 +6,7 @@
 <h2>ViewBag.Title</h2>
 
 <p>
-    @Html.ActionLink("Create New", "Create")
+    @Html.ActionLink("Create New", "Register", null, new { @class = "btn btn-primary" })
 </p>
 
 <table class="table">
@@ -40,7 +40,7 @@
                     <button class="dropdown-toggle btn btn-primary" data-toggle="dropdown">Action</button>
                     <ul class="dropdown-menu">
                         <li>@Html.ActionLink("Edit", "Edit", new { id = item.Id })</li>
-                        <li>@Html.ActionLink("Details", "Details", new { id = item.Id })</li>
+                        <li>@Html.ActionLink("Details", "Details", new { id = item.Id })</li>                        
                         <li class="divider"></li>
                         <li>@Html.ActionLink("Delete", "Delete", new { id = item.Id })</li>
                     </ul>
@@ -50,4 +50,3 @@
     }
 
 </table>
-

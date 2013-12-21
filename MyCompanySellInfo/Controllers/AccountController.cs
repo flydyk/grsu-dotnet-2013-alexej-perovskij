@@ -9,6 +9,7 @@ using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.Owin.Security;
 using MyCompanySellInfo.Models;
+using MyCompanySellInfo.Helpers;
 
 namespace MyCompanySellInfo.Controllers
 {
@@ -72,7 +73,7 @@ namespace MyCompanySellInfo.Controllers
         //
         // POST: /Account/Register
         [HttpPost]
-        [AllowAnonymous]
+        [Authorize(Roles="canDelete")]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Register(RegisterViewModel model)
         {
@@ -82,9 +83,9 @@ namespace MyCompanySellInfo.Controllers
                 var result = await UserManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
-                    await UserManager.AddToRoleAsync(user.Id, "canEdit");//========================================
-                    await SignInAsync(user, isPersistent: false);
-                    return RedirectToAction("Index", "Home");
+                    await UserManager.AddToRoleAsync(user.Id, Enum.GetName(typeof(RolesEnum), model.Role));//========================================
+                    //await SignInAsync(user, isPersistent: false);
+                    return RedirectToAction("Index", "Admin");
                 }
                 else
                 {
