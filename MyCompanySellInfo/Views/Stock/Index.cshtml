@@ -5,7 +5,6 @@
 <link href="~/Content/PagedList.css" rel="stylesheet" type="text/css" />
 
 @{
-    Stock stock = new Stock();
     ViewBag.Title = "Stocks";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
@@ -147,7 +146,7 @@
                         Html.DisplayFor(modelItem => item.Manager.LastName).ToString();
                         @Html.ActionLink(managerName, "Details", "Manager", new { id = item.ManagerID }, null)
                 }
-            </td>Admin
+            </td>
             <td>
                 <div class="dropdown">
                     <button class="dropdown-toggle btn btn-primary" data-toggle="dropdown">Action</button>

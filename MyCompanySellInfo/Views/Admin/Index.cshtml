@@ -1,7 +1,10 @@
 ﻿@model IEnumerable<MyCompanySellInfo.Models.ApplicationUser>
 @{
+    ViewBag.Title = "Users";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
+<h2>ViewBag.Title</h2>
+
 <p>
     @Html.ActionLink("Create New", "Create")
 </p>
