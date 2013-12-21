@@ -1,0 +1,50 @@
+﻿@model IEnumerable<MyCompanySellInfo.Models.ApplicationUser>
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.UserName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.PasswordHash)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Id)
+        </th>
+        <th>Action</th>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.UserName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.PasswordHash)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Id)
+            </td>
+            <td>
+                <div class="dropdown">
+                    <button class="dropdown-toggle btn btn-primary" data-toggle="dropdown">Action</button>
+                    <ul class="dropdown-menu">
+                        <li>@Html.ActionLink("Edit", "Edit", new { id = item.Id })</li>
+                        <li>@Html.ActionLink("Details", "Details", new { id = item.Id })</li>
+                        <li class="divider"></li>
+                        <li>@Html.ActionLink("Delete", "Delete", new { id = item.Id })</li>
+                    </ul>
+                </div>
+            </td>
+        </tr>
+    }
+
+</table>
+

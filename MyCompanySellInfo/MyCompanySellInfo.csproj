@@ -167,6 +167,7 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\Startup.Auth.cs" />
     <Compile Include="Controllers\AccountController.cs" />
+    <Compile Include="Controllers\AdminController.cs" />
     <Compile Include="Controllers\DbProductionController.cs" />
     <Compile Include="Controllers\GoodController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
@@ -177,6 +178,7 @@
     </Compile>
     <Compile Include="Helpers\DataProcessor.cs" />
     <Compile Include="Helpers\PageableData.cs" />
+    <Compile Include="Helpers\Roles.cs" />
     <Compile Include="Helpers\SearchFilters.cs" />
     <Compile Include="Migrations\201312121015489_InitialCreate.cs" />
     <Compile Include="Migrations\201312121015489_InitialCreate.Designer.cs">
@@ -184,6 +186,8 @@
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
+    <Compile Include="Models\AppRole.cs" />
+    <Compile Include="Models\AppUser.cs" />
     <Compile Include="Models\Good.cs">
       <DependentUpon>Production.tt</DependentUpon>
     </Compile>
@@ -303,6 +307,9 @@
     <Content Include="Views\Stock\Edit.cshtml" />
     <Content Include="Views\Stock\Index.cshtml" />
     <Content Include="Views\DbProduction\Index.cshtml" />
+    <Content Include="Views\Admin\Index.cshtml" />
+    <Content Include="Views\Admin\Details.cshtml" />
+    <Content Include="Views\Admin\Edit.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />

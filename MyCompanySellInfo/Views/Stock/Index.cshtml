@@ -18,16 +18,37 @@
 
 <h2>@ViewBag.Title</h2>
 
-<p>@Html.ActionLink("Create New", "Create")</p>
 
-@using (Html.BeginForm("Index", "Stock", FormMethod.Get))
+@using (Html.BeginForm("Index", "Stock", FormMethod.Get, new { @class = "form-inline", role = "form" }))
 {
-    <p>
-        Filter by: @Html.DropDownList("searchItem", ViewBag.searchItems as SelectList)
-        Search: @Html.TextBox("searchString", "find out ...")
-        <input type="submit" value="Search" class="btn btn-default" />
-        @Html.ActionLink("Reset", "Index", null, new { @class = "btn btn-default", @type = "button" })
-    </p>
+    <div class="table">
+        <div class="row">
+            <div class="col-xs-2">
+                <label>Filter by:</label>
+            </div>
+            <div class="col-xs-3">
+                <label>Search:</label>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-xs-2">
+                @Html.DropDownList("searchItem", ViewBag.searchItems as SelectList, new { @class = "form-control" })
+            </div>
+            <div class="col-xs-3">
+                @Html.TextBox("searchString", null, new { @class = "form-control", @placeholder = "Search string" })
+            </div>
+            <div class="col-xs-2">
+                <input type="submit" value="Search" class="form-control btn btn-info" />
+            </div>
+            <div class="col-xs-2">
+                @Html.ActionLink("Reset", "Index", null, new { @class = "form-control btn btn-danger", @type = "button" })
+            </div>
+            <div class="col-xs-2">
+                @Html.ActionLink("Create New", "Create", null, new { @class = "form-control btn btn-primary", @type = "button" })
+            </div>
+        </div>
+    </div>
 }
 
 <table class="table">
@@ -126,10 +147,10 @@
                         Html.DisplayFor(modelItem => item.Manager.LastName).ToString();
                         @Html.ActionLink(managerName, "Details", "Manager", new { id = item.ManagerID }, null)
                 }
-            </td>
+            </td>Admin
             <td>
                 <div class="dropdown">
-                    <button class="dropdown-toggle btn-primary" data-toggle="dropdown">Action</button>
+                    <button class="dropdown-toggle btn btn-primary" data-toggle="dropdown">Action</button>
                     <ul class="dropdown-menu">
                         <li>@Html.ActionLink("Edit", "Edit", new { id = item.Id })</li>
                         <li>@Html.ActionLink("Details", "Details", new { id = item.Id })</li>
@@ -141,7 +162,6 @@
         </tr>
     }
 </table>
-<br />
 Page @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) of @Model.PageCount
 
 @Html.PagedListPager(Model, page =>
