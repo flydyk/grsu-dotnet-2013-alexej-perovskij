@@ -64,7 +64,7 @@ namespace MyCompanySellInfo.Controllers
 
         //
         // GET: /Account/Register
-        [AllowAnonymous]
+        [Authorize(Roles = "canDelete")]
         public ActionResult Register()
         {
             return View();
@@ -83,7 +83,7 @@ namespace MyCompanySellInfo.Controllers
                 var result = await UserManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
-                    await UserManager.AddToRoleAsync(user.Id, Enum.GetName(typeof(RolesEnum), model.Role));//========================================
+                    await UserManager.AddToRoleAsync(user.Id, Enum.GetName(typeof(RolesEnum), model.Role));
                     //await SignInAsync(user, isPersistent: false);
                     return RedirectToAction("Index", "Admin");
                 }

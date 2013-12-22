@@ -1,0 +1,17 @@
+﻿@model object
+<ul class="list-inline">
+    <li>
+        <div class="dropdown">
+            <button class="dropdown-toggle btn btn-primary" data-toggle="dropdown">Action</button>
+            <ul class="dropdown-menu">
+                <li>@Html.ActionLink("Edit", "Edit", new { id = Model })</li>
+                <li>@Html.ActionLink("Details", "Details", new { id = Model })</li>
+                <li class="divider"></li>
+                <li>@Html.ActionLink("Delete", "Delete", new { id = Model })</li>
+            </ul>
+        </div>
+    </li>
+    <li>
+        @Html.ActionLink("Delete", "Delete", new { id = Model }, new { @class = "btn btn-danger" })
+    </li>
+</ul>
